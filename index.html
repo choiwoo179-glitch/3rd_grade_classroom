@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3학년 과학 학습 허브</title>
+
+  <style>
+    :root {
+      --bg: #f4f8ff;
+      --card: #ffffff;
+      --primary: #2f6fed;
+      --primary-hover: #1f5ed5;
+      --text: #1f2937;
+      --subtext: #5f6b7a;
+      --border: #dbe7ff;
+      --shadow: 0 10px 30px rgba(47, 111, 237, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        "Pretendard",
+        "Noto Sans KR",
+        "Apple SD Gothic Neo",
+        "Malgun Gothic",
+        Arial,
+        sans-serif;
+      background:
+        radial-gradient(circle at top left, #e7f0ff 0, transparent 34%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .page {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 72px 0 80px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 42px;
+    }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      width: min(720px, 100%);
+      margin: 0 auto;
+      color: var(--subtext);
+      font-size: clamp(1rem, 2.4vw, 1.15rem);
+      line-height: 1.8;
+      word-break: keep-all;
+    }
+
+    .materials-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .button-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .material-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+      padding: 0 22px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid #dfe8f7;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 1.08rem;
+      font-weight: 700;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease;
+    }
+
+    .material-link::after {
+      content: "→";
+      color: var(--primary);
+      font-size: 1.3rem;
+      transition: transform 0.18s ease;
+    }
+
+    .material-link:hover {
+      transform: translateY(-2px);
+      border-color: #a9c5ff;
+      background: #f8fbff;
+      box-shadow: 0 8px 22px rgba(47, 111, 237, 0.12);
+    }
+
+    .material-link:hover::after {
+      transform: translateX(4px);
+    }
+
+    .material-link:focus-visible {
+      outline: 3px solid rgba(47, 111, 237, 0.28);
+      outline-offset: 3px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: #7b8794;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding-top: 48px;
+      }
+
+      .materials-card {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .button-list {
+        grid-template-columns: 1fr;
+      }
+
+      .material-link {
+        min-height: 66px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>3학년 과학 학습 허브</h1>
+      <p>
+        지난 수업 때 본 자료를 다시 보고, 학습지 빈칸을 채우거나
+        이해 안 된 부분을 복습해보세요.
+      </p>
+    </section>
+
+    <section class="materials-card" aria-label="수업 자료 목록">
+      <div id="buttonList" class="button-list"></div>
+    </section>
+
+    <p class="footer-note">
+      버튼을 누르면 해당 수업 자료가 열립니다.
+    </p>
+  </main>
+
+  <script>
+    /*
+      수업 자료 개수를 아래 숫자로 설정하세요.
+      예: 8로 설정하면
+      3rd_class_1.html ~ 3rd_class_8.html 링크가 자동 생성됩니다.
+    */
+    const TOTAL_MATERIALS = 10;
+
+    const buttonList = document.getElementById("buttonList");
+
+    for (let n = 1; n <= TOTAL_MATERIALS; n++) {
+      const link = document.createElement("a");
+
+      link.className = "material-link";
+      link.href = `3rd_class_${n}.html`;
+      link.textContent = `수업 자료 (${n})`;
+
+      buttonList.appendChild(link);
+    }
+  </script>
+</body>
+</html>
