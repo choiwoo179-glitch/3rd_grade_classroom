@@ -153,8 +153,10 @@
 
 <body>
   <main class="page">
+
     <section class="hero">
       <h1>3학년 과학 학습 허브</h1>
+
       <p>
         지난 수업 때 본 자료를 다시 보고, 학습지 빈칸을 채우거나
         이해 안 된 부분을 복습해보세요.
@@ -168,27 +170,62 @@
     <p class="footer-note">
       버튼을 누르면 해당 수업 자료가 열립니다.
     </p>
+
   </main>
 
   <script>
     /*
-      수업 자료 개수를 아래 숫자로 설정하세요.
-      예: 8로 설정하면
-      3rd_class_1.html ~ 3rd_class_8.html 링크가 자동 생성됩니다.
+      수업 자료 목록
+
+      name : 화면에 표시되는 수업 자료 이름
+      file : 같은 GitHub 저장소에 있는 HTML 파일 이름
+
+      새로운 수업 자료를 추가하려면
+      아래 배열에 한 줄을 추가하면 됩니다.
+
+      예:
+      { name: "운동 에너지", file: "3rd_class_6.html" }
     */
-    const TOTAL_MATERIALS = 10;
+
+    const materials = [
+      {
+        name: "속력과 등속 운동",
+        file: "3rd_class_1.html"
+      },
+      {
+        name: "거리-속력-시간의 관계",
+        file: "3rd_class_2.html"
+      },
+      {
+        name: "자유 낙하 운동",
+        file: "3rd_class_3.html"
+      },
+      {
+        name: "과학에서의 일",
+        file: "3rd_class_4.html"
+      },
+      {
+        name: "중력에 의한 위치 에너지",
+        file: "3rd_class_5.html"
+      }
+    ];
 
     const buttonList = document.getElementById("buttonList");
 
-    for (let n = 1; n <= TOTAL_MATERIALS; n++) {
+    materials.forEach((material, index) => {
+
       const link = document.createElement("a");
 
       link.className = "material-link";
-      link.href = `3rd_class_${n}.html`;
-      link.textContent = `수업 자료 (${n})`;
+
+      link.href = material.file;
+
+      link.textContent =
+        `수업 자료 (${index + 1}) · ${material.name}`;
 
       buttonList.appendChild(link);
-    }
+    });
   </script>
+
 </body>
 </html>
