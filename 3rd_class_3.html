@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef5f3">
+<title>떨어지는 물체의 속력 변화 · 운동과 에너지</title>
+<style>
+:root{
+  --bg:#eef5f3;
+  --paper:rgba(255,255,255,.84);
+  --ink:#2c3e3a;
+  --muted:#627973;
+  --teal:#3cba95;
+  --deep:#13765f;
+  --sage:#7faaa1;
+  --red:#ff6b6b;
+  --green:#95e06c;
+  --dark:#122b27;
+  --line:rgba(44,62,58,.14);
+  --shadow:0 18px 55px rgba(35,72,64,.15);
+  --radius:clamp(18px,2.2vw,34px);
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{color:var(--ink);background:var(--bg);font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;word-break:keep-all}
+button,a{font:inherit}
+button{touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:4px solid rgba(60,186,149,.34);outline-offset:3px}
+#app{position:relative;width:100%;height:100%;isolation:isolate;background:
+  radial-gradient(circle at 12% 9%,rgba(60,186,149,.18),transparent 31%),
+  radial-gradient(circle at 88% 90%,rgba(127,170,161,.22),transparent 34%),
+  linear-gradient(rgba(60,186,149,.045) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(60,186,149,.045) 1px,transparent 1px),
+  var(--bg);
+  background-size:auto,auto,32px 32px,32px 32px,auto;
+}
+.slide{position:absolute;inset:0;display:grid;align-content:center;gap:clamp(12px,1.8vw,26px);padding:clamp(22px,3.7vw,58px) clamp(82px,8vw,136px) clamp(22px,3.5vw,54px) clamp(24px,5vw,86px);opacity:0;visibility:hidden;pointer-events:none;transform:translateX(4%);transition:opacity .42s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide::before{content:"";position:absolute;inset:clamp(12px,2vw,28px);border:1px solid rgba(60,186,149,.17);border-radius:var(--radius);pointer-events:none}
+.slide.active{opacity:1;visibility:visible;pointer-events:auto;transform:none}
+.slide-head{position:relative;z-index:2}
+.eyebrow{display:flex;align-items:center;gap:.65em;color:var(--deep);font-size:clamp(12px,1.12vw,18px);font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.eyebrow::before{content:"";width:clamp(28px,4vw,60px);height:4px;border-radius:9px;background:var(--teal);box-shadow:0 0 15px rgba(60,186,149,.42)}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(40px,6.6vw,98px);line-height:1.03;letter-spacing:-.055em}
+h2{margin-top:.22em;font-size:clamp(26px,3.65vw,56px);line-height:1.18;letter-spacing:-.04em}
+h3{font-size:clamp(17px,1.8vw,27px);line-height:1.3}
+.lead{font-size:clamp(19px,2.45vw,39px);line-height:1.46;font-weight:820}
+.body{font-size:clamp(15px,1.42vw,22px);line-height:1.58}
+.small{font-size:clamp(11px,.95vw,15px);line-height:1.5;color:var(--muted)}
+.accent{color:var(--deep)}
+.warn{color:#d84848}
+.center{text-align:center;justify-items:center}
+.paper{background:var(--paper);border:1px solid rgba(60,186,149,.22);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+.dark{color:#f5fffc;background:linear-gradient(145deg,#183b34,#102a25);border:1px solid rgba(60,186,149,.72);border-radius:var(--radius);box-shadow:0 0 34px rgba(60,186,149,.14),var(--shadow)}
+.btn-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px}
+.btn{border:0;border-radius:999px;min-width:7em;padding:.68em 1.15em;cursor:pointer;font-size:clamp(13px,1.13vw,18px);font-weight:900;color:#06241c;background:var(--teal);box-shadow:0 9px 22px rgba(60,186,149,.24);transition:.17s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(1px) scale(.985)}
+.btn.secondary{background:white;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.red{background:var(--red);color:#491616}
+.btn.active{background:var(--green);color:#17350c}
+.reveal{color:transparent;background:linear-gradient(110deg,rgba(60,186,149,.42),rgba(127,170,161,.34));background-size:220% 100%;border-color:rgba(60,186,149,.34);box-shadow:none;filter:none;transition:color .42s ease,background .42s ease,transform .42s ease,box-shadow .42s ease;animation:placeholder 2.2s ease-in-out infinite}
+.reveal>*{opacity:0;visibility:hidden;transition:opacity .32s ease}
+.reveal:not(.visible)>*{pointer-events:none}
+.reveal.visible{color:inherit;background:var(--paper);box-shadow:var(--shadow);animation:none}
+.reveal.visible>*{opacity:1;visibility:visible}
+.reveal.reveal-text{display:block;min-height:2.8em;padding:.55em .9em;border-radius:16px;font-size:clamp(14px,1.35vw,21px);font-weight:760;line-height:1.48}
+.reveal.reveal-text.visible{background:rgba(255,255,255,.8);box-shadow:none}
+@keyframes placeholder{50%{background-position:100% 0;opacity:.72}}
+.click-hint{position:absolute;z-index:5;left:clamp(24px,5vw,82px);bottom:clamp(18px,3vw,42px);display:flex;align-items:center;gap:9px;color:var(--muted);font-size:clamp(11px,.95vw,15px);animation:hint 1.7s ease-in-out infinite}
+.click-hint::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--teal)}
+@keyframes hint{50%{opacity:.5}}
+
+/* 1 */
+.hero{grid-template-columns:1.18fr .82fr;align-items:center}
+.hero-copy{position:relative;z-index:2}
+.hero-copy p{margin-top:clamp(16px,2.2vw,32px);color:#58706a;font-size:clamp(19px,2.05vw,31px);font-weight:760}
+.fall-streak{width:min(640px,72vw);height:6px;margin-bottom:clamp(18px,3vw,40px);background:linear-gradient(90deg,transparent,var(--teal),transparent);box-shadow:0 0 18px rgba(60,186,149,.5)}
+.hero-art{position:relative;width:min(35vw,480px);aspect-ratio:1;justify-self:end;display:grid;place-items:center;animation:float 4s ease-in-out infinite}
+.hero-art::before{content:"";position:absolute;inset:2%;border-radius:32% 68% 56% 44%;background:radial-gradient(circle,rgba(60,186,149,.32),rgba(60,186,149,.08) 57%,transparent 73%);filter:blur(8px)}
+.hero-art .image-shell{position:absolute;inset:8%;overflow:hidden;border-radius:var(--radius);border:1px solid rgba(60,186,149,.58);box-shadow:var(--shadow);transform:rotate(2deg)}
+.hero-art img{width:100%;height:100%;display:block;object-fit:cover}
+.image-fallback{position:absolute;inset:0;display:grid;place-items:center;color:rgba(60,186,149,.72);font-size:clamp(52px,9vw,128px);font-weight:950;background:linear-gradient(145deg,#183b34,#102a25)}
+.loaded>.image-fallback{display:none}
+@keyframes float{50%{transform:translate(-9px,-7px) rotate(-.8deg)}}
+
+/* 2–4, 6–8, 10 */
+.goal-stack{width:min(980px,100%);margin:auto;display:grid;gap:14px}
+.goal{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:clamp(14px,2vw,26px);padding:clamp(18px,2.2vw,32px)}
+.goal-num{width:clamp(52px,5vw,74px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:clamp(22px,2.2vw,34px);font-weight:950;background:rgba(60,186,149,.12);color:var(--deep)}
+.goal p{font-size:clamp(17px,1.85vw,28px);line-height:1.45;font-weight:760}
+.video-orb{width:clamp(118px,15vw,220px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 38% 32%,#55d9b4,var(--teal) 48%,#176d58);box-shadow:0 0 0 18px rgba(60,186,149,.1),0 0 60px rgba(60,186,149,.28)}
+.play{margin-left:8%;width:0;height:0;border-top:clamp(23px,2.8vw,40px) solid transparent;border-bottom:clamp(23px,2.8vw,40px) solid transparent;border-left:clamp(36px,4.5vw,64px) solid white}
+.prompt-layout{width:min(1080px,100%);margin:auto;display:grid;grid-template-columns:minmax(320px,1fr) minmax(280px,.72fr);align-items:center;gap:clamp(14px,2vw,28px)}
+.prompt-image{height:min(55vh,510px);overflow:hidden;position:relative;background:#122b27}
+.prompt-image img{width:100%;height:100%;display:block;object-fit:contain}
+.prompt-copy{display:grid;gap:12px}
+.concept-stack{width:min(980px,100%);margin:auto;display:grid;gap:12px;padding:clamp(18px,2.4vw,34px)}
+.concept-question{padding:clamp(16px,2vw,27px);text-align:center;font-size:clamp(22px,2.5vw,38px);font-weight:900;border-radius:22px;background:rgba(60,186,149,.1)}
+.answer-slot{min-width:min(420px,86vw);min-height:76px;display:grid;place-items:center;padding:15px 22px;border-radius:20px;color:transparent;background:linear-gradient(110deg,rgba(60,186,149,.52),rgba(127,170,161,.5));font-size:clamp(22px,2.5vw,38px);font-weight:950;transition:.35s ease}
+.answer-slot.open{color:var(--deep);background:white;box-shadow:var(--shadow)}
+.hint-stage{position:fixed;z-index:22;inset:8%;display:grid;place-items:center;pointer-events:none;opacity:0;transform:scale(.97);transition:.2s ease}
+.hint-stage.show{opacity:1;transform:none}
+.hint-card{width:min(720px,86vw);height:min(62vh,520px);padding:12px;overflow:hidden}
+.hint-card img{width:100%;height:100%;display:block;object-fit:contain;border-radius:calc(var(--radius) - 10px);background:#dfe9e6}
+.paper-demo{width:min(1000px,100%);margin:auto;display:grid;grid-template-columns:minmax(310px,.95fr) minmax(300px,1.05fr);gap:clamp(16px,2.4vw,30px);align-items:center}
+.paper-demo .image{height:min(54vh,500px);overflow:hidden}
+.paper-demo img{width:100%;height:100%;display:block;object-fit:contain}
+.paper-demo .copy{display:grid;gap:12px}
+.video-card{width:min(900px,100%);margin:auto;padding:clamp(26px,4vw,58px);display:grid;justify-items:center;gap:clamp(20px,3vw,36px);text-align:center}
+.paired-reveal{display:grid;justify-items:center;gap:14px;background:transparent;box-shadow:none;animation:none}
+.paired-reveal.visible{background:transparent;box-shadow:none}
+.video-subtext{padding:.7em 1em;border-radius:16px;font-size:clamp(14px,1.35vw,21px);font-weight:760;line-height:1.48}
+.summary-panel{width:min(1040px,100%);margin:auto;padding:clamp(22px,3vw,42px);display:grid;gap:13px;text-align:center}
+.g-value{display:inline-flex;align-items:baseline;justify-content:center;min-width:3.3em;padding:.05em .35em;border-bottom:4px solid var(--teal);font-size:clamp(42px,6vw,86px);font-weight:950}
+.g-value.reveal{min-height:1.15em;border-radius:14px 14px 0 0}
+.g-value.visible{background:rgba(60,186,149,.08)}
+.unit-card{padding:clamp(16px,2vw,25px);border-radius:20px;background:rgba(60,186,149,.08);font-size:clamp(18px,2vw,30px);font-weight:850}
+
+/* labs */
+.lab-layout{width:min(1160px,100%);margin:auto;display:grid;grid-template-columns:minmax(340px,1fr) minmax(250px,.42fr);gap:clamp(12px,1.7vw,22px);align-items:center}
+.chamber-wrap{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:9px;min-width:0}
+.chamber{position:relative;height:min(50vh,500px);min-height:310px;overflow:hidden;border:2px solid rgba(60,186,149,.62);border-radius:24px;background:
+  radial-gradient(circle at 30% 22%,rgba(255,255,255,.85),transparent 28%),
+  linear-gradient(rgba(60,186,149,.07) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(60,186,149,.07) 1px,transparent 1px),
+  linear-gradient(#dfeeea,#cbded8);
+  background-size:auto,28px 28px,28px 28px,auto;
+  box-shadow:inset 0 0 45px rgba(19,118,95,.08),var(--shadow);
+}
+.floor{position:absolute;z-index:8;left:0;right:0;bottom:0;height:12px;background:linear-gradient(#506b64,#2d4841);box-shadow:0 -5px 0 rgba(60,186,149,.18)}
+.scale{position:relative;height:min(50vh,500px);min-height:310px;color:var(--muted);font-size:clamp(9px,.8vw,12px);font-weight:850}
+.scale span{position:absolute;left:0;transform:translateY(-50%);white-space:nowrap}
+.scale span::before{content:"";display:inline-block;width:12px;margin-right:4px;border-top:2px solid var(--sage);vertical-align:middle}
+.lab-panel{padding:clamp(15px,1.8vw,24px);display:grid;gap:13px}
+.readout{display:grid;gap:5px;padding:13px 15px;border-radius:17px;background:rgba(60,186,149,.08);font-size:clamp(13px,1.1vw,17px);font-weight:800;font-variant-numeric:tabular-nums}
+.lab-note{padding:12px 14px;border-left:4px solid var(--teal);background:rgba(255,255,255,.55);border-radius:0 14px 14px 0}
+.ball{position:absolute;z-index:12;border-radius:50%;cursor:grab;touch-action:none;background:
+  radial-gradient(circle at 32% 25%,rgba(255,255,255,.75) 0 7%,transparent 8%),
+  radial-gradient(circle at 36% 28%,#ebfff9,#3cba95 32%,#13765f 68%,#0d4337);
+  border:2px solid #173e34;box-shadow:0 8px 16px rgba(17,58,49,.26);will-change:transform,left,top;
+}
+.ball:active{cursor:grabbing}
+.ball.dragging{filter:drop-shadow(0 0 12px rgba(60,186,149,.8));transform:scale(1.12)}
+.reference-line{position:absolute;z-index:13;height:3px;border-radius:3px;background:var(--red);box-shadow:0 0 8px rgba(255,107,107,.5);pointer-events:none}
+.ghost{position:absolute;z-index:6;border-radius:50%;opacity:.24;border:2px solid var(--teal);background:rgba(60,186,149,.32);pointer-events:none}
+.ghost.feather-ghost{border-color:var(--sage);background:rgba(127,170,161,.33)}
+.gap-mark{position:absolute;z-index:10;width:112px;color:#8f2929;font-size:clamp(9px,.76vw,12px);font-weight:900;display:none;align-items:center;pointer-events:none}
+.gap-mark svg{width:38px;height:100%;flex:0 0 38px;overflow:visible}
+.gap-mark polyline{fill:none;stroke:var(--red);stroke-width:2.5;vector-effect:non-scaling-stroke}
+.gap-mark span{padding:3px 5px;border-radius:8px;background:rgba(255,255,255,.84);white-space:nowrap}
+.show-gaps .gap-mark{display:flex}
+.switch-wrap{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:900}
+.switch{position:relative;width:68px;height:36px;display:inline-block}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch-ui{position:absolute;inset:0;border-radius:999px;background:var(--sage);cursor:pointer;transition:.3s ease}
+.switch-ui::after{content:"";position:absolute;width:28px;height:28px;left:4px;top:4px;border-radius:50%;background:white;box-shadow:0 3px 10px rgba(0,0,0,.22);transition:.3s ease}
+.switch input:checked+.switch-ui{background:var(--teal)}
+.switch input:checked+.switch-ui::after{transform:translateX(32px)}
+.air-particles{position:absolute;z-index:3;inset:0;pointer-events:none}
+.air-particle{position:absolute;width:7px;height:7px;border-radius:50%;background:rgba(60,186,149,.42);animation:airDrift 4.5s ease-in-out infinite}
+.vacuum .air-particle{animation:airOut .65s ease-in forwards}
+@keyframes airDrift{50%{transform:translate(18px,-12px);opacity:.25}}
+@keyframes airOut{to{transform:translateX(120vw) scale(.2);opacity:0}}
+.air-enter .air-particle{animation:airIn .65s ease-out both}
+@keyframes airIn{from{transform:translateX(120vw) scale(.2);opacity:0}}
+.object-label{position:absolute;z-index:13;transform:translate(-50%,-110%);padding:.25em .55em;border-radius:999px;background:rgba(18,43,39,.87);color:white;font-size:clamp(9px,.8vw,12px);font-weight:850;pointer-events:none}
+.bowling{position:absolute;z-index:12;border-radius:50%;background:radial-gradient(circle at 34% 28%,#96b8af,#263e39 42%,#0e201c 75%);border:2px solid #0f2923;box-shadow:0 7px 14px rgba(0,0,0,.3)}
+.bowling::before,.bowling::after{content:"";position:absolute;width:11%;aspect-ratio:1;border-radius:50%;background:#081713;top:22%}
+.bowling::before{left:38%}.bowling::after{left:55%}
+.feather{position:absolute;z-index:12;border-radius:80% 15% 80% 12%;background:linear-gradient(135deg,#f6fff9 0 45%,#87b9ad 47% 52%,#e6f8f2 54%);border:1px solid #547d73;filter:drop-shadow(0 6px 7px rgba(0,0,0,.16))}
+.feather::after{content:"";position:absolute;left:49%;top:5%;bottom:-18%;border-left:2px solid #456d63;transform:rotate(16deg)}
+.dual-gaps .gap-mark{width:63px}
+
+/* analysis and conclusion */
+.why-panel{width:min(1040px,100%);margin:auto;padding:clamp(22px,3vw,42px);display:grid;gap:13px;text-align:center}
+.why-force{font-size:clamp(28px,3.4vw,52px);font-weight:950;color:var(--deep)}
+.analysis-grid{width:min(1380px,100%);margin:auto;display:grid;grid-template-columns:minmax(560px,1.15fr) minmax(390px,.85fr);gap:clamp(12px,1.7vw,24px);align-items:center}
+.analysis-experiment .lab-layout{grid-template-columns:minmax(310px,1fr) minmax(205px,.46fr);gap:8px}
+.analysis-experiment .chamber,.analysis-experiment .scale{height:min(39vh,390px);min-height:280px}
+.analysis-experiment .lab-panel{padding:12px;gap:8px}
+.analysis-side{display:grid;gap:12px;min-width:0}
+.result-table{width:100%;border-collapse:collapse;table-layout:fixed;background:rgba(255,255,255,.82);font-size:clamp(10px,.85vw,14px)}
+.result-table th,.result-table td{height:clamp(34px,4.2vh,52px);padding:5px;border:1px solid rgba(44,62,58,.26);text-align:center}
+.result-table th:first-child,.result-table td:first-child{width:28%;font-weight:850;background:rgba(60,186,149,.1)}
+.table-answer{visibility:hidden;opacity:0;color:var(--deep);font-weight:950}
+.result-table.show-answer .table-answer{visibility:visible;opacity:1}
+.graph-card{position:relative;padding:10px;background:rgba(255,255,255,.82);border-radius:18px;border:1px solid rgba(60,186,149,.22)}
+.graph-card svg{display:block;width:100%;height:min(28vh,280px)}
+.answer-line{opacity:0;transition:opacity .15s ease}
+.graph-card.show-answer .answer-line{opacity:1}
+.summary-slide{gap:10px}
+.summary-slide h2{font-size:clamp(21px,2.65vw,42px)}
+.summary-image{display:block;width:min(480px,58vw);max-height:22vh;object-fit:contain;margin:auto}
+.summary-detail{display:grid;justify-items:center;gap:10px;padding:12px;border-radius:18px}
+.info-dialog{max-width:min(660px,86vw);padding:clamp(22px,3vw,38px);border:1px solid rgba(60,186,149,.5);border-radius:24px;color:var(--ink);background:#f7fffc;box-shadow:var(--shadow);font-size:clamp(18px,2vw,28px);font-weight:850;text-align:center;cursor:pointer}
+.info-dialog::backdrop{background:rgba(18,43,39,.55);backdrop-filter:blur(5px)}
+.definition-panel{width:min(1040px,100%);margin:auto;padding:clamp(18px,2.5vw,34px);display:grid;gap:12px;text-align:center}
+.final-graph{width:min(700px,100%);margin:auto}
+.final-graph svg{display:block;width:100%;height:min(38vh,360px)}
+.text-140{font-size:clamp(19.6px,1.89vw,29.4px)!important}
+.summary-text-140{font-size:clamp(21px,1.988vw,30.8px)}
+.definition-lead{font-size:clamp(26.6px,3.43vw,54.6px)}
+.definition-subtext{font-size:clamp(21px,1.988vw,30.8px)}
+.slide13-visuals{width:min(1100px,100%);margin:auto;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:clamp(14px,2vw,26px);align-items:stretch}
+.slide13-visuals .final-graph{width:100%;height:min(38vh,360px);padding:10px}
+.slide13-visuals .final-graph svg{height:100%}
+.slide13-image{display:block;width:100%;height:min(38vh,360px);object-fit:contain;border-radius:var(--radius)}
+.application-grid{width:min(1180px,100%);margin:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,28px)}
+.application-card{min-width:0;padding:clamp(12px,1.5vw,20px);display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;overflow:hidden}
+.application-card h3{font-size:clamp(22px,2.4vw,36px)}
+.application-card img{display:block;width:100%;height:min(42vh,410px);object-fit:contain;border-radius:calc(var(--radius) - 10px)}
+.application-card a{display:block;min-height:0}
+.review-list{width:min(1180px,100%);margin:auto;padding:clamp(18px,2.3vw,30px) clamp(28px,4vw,56px);display:grid;gap:clamp(7px,1vh,12px);font-size:clamp(14px,1.22vw,19px);font-weight:730;line-height:1.42;text-align:left}
+.review-list li::marker{color:var(--deep);font-weight:950}
+.inline-answer{display:inline-block;min-width:4em;padding:.05em .3em;border-radius:.45em;font-weight:900;color:transparent;vertical-align:baseline}
+.inline-answer.visible{color:var(--deep);background:rgba(60,186,149,.12);box-shadow:none}
+.area-slide{gap:10px}
+.area-lead,.area-detail{width:min(1040px,100%);font-size:clamp(18.2px,2.555vw,39.2px);font-weight:820;line-height:1.45}
+.area-graph-wrap{display:grid;justify-items:center;gap:8px}
+.area-graph-wrap .final-graph{width:min(620px,72vw);padding:8px}
+.area-graph-wrap .final-graph svg{height:min(31vh,300px)}
+.area-fill{fill:rgba(60,186,149,.28);stroke:rgba(19,118,95,.72);stroke-width:2;opacity:0;transition:opacity .3s ease}
+#areaGraph.show-area .area-fill{opacity:1}
+.area-detail{padding:.35em .6em;border-radius:16px}
+
+/* nav */
+.nav{position:fixed;z-index:30;right:clamp(10px,2vw,28px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;padding:11px 9px;border-radius:26px;background:rgba(255,255,255,.52);border:1px solid rgba(255,255,255,.78);box-shadow:0 14px 42px rgba(38,60,55,.17);backdrop-filter:blur(16px)}
+.nav button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);color:var(--ink);background:rgba(255,255,255,.88);cursor:pointer;font-size:22px;font-weight:900}
+.nav button:hover{background:var(--teal)}
+.progress{width:6px;height:112px;border-radius:8px;background:rgba(38,60,55,.1);overflow:hidden}
+.progress i{display:block;width:100%;height:10%;border-radius:8px;background:var(--teal);transition:height .35s ease}
+.counter{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;font-weight:950;letter-spacing:.14em;font-variant-numeric:tabular-nums}
+.toast{position:fixed;z-index:50;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:11px 18px;border-radius:999px;color:white;background:rgba(18,43,39,.94);font-size:14px;transition:.25s ease}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:900px){
+  .slide{padding:20px 74px 20px 22px}
+  .hero-art{width:39vw}
+  .lab-layout{grid-template-columns:minmax(0,1fr) 250px}
+  .chamber,.scale{height:min(48vh,440px)}
+  .analysis-grid{grid-template-columns:1fr}
+  .analysis-experiment .chamber,.analysis-experiment .scale{height:34vh;min-height:250px}
+  .slide13-visuals{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .slide{padding:16px 14px 76px;overflow:auto;align-content:start}
+  .slide::before{inset:7px}
+  .hero{grid-template-columns:1fr;align-content:center}
+  .hero-art{position:absolute;right:-5%;bottom:9%;width:56vw;opacity:.28}
+  .prompt-layout,.paper-demo,.lab-layout{grid-template-columns:1fr}
+  .analysis-experiment .lab-layout{grid-template-columns:1fr}
+  .slide13-visuals,.application-grid{grid-template-columns:1fr}
+  .slide13-image,.application-card img{height:min(30vh,260px)}
+  .review-list{padding:16px 28px}
+  .prompt-image,.paper-demo .image{height:min(38vh,340px)}
+  .chamber-wrap{grid-template-columns:minmax(0,1fr) 45px}
+  .chamber,.scale{height:44vh;min-height:300px}
+  .lab-panel{padding:12px}
+  .nav{left:50%;right:auto;top:auto;bottom:7px;transform:translateX(-50%);flex-direction:row;padding:7px 10px}
+  .progress{width:92px;height:6px}
+  .progress i{height:100%;width:10%}
+  .counter{writing-mode:horizontal-tb;transform:none}
+  .click-hint{display:none}
+}
+@media(max-height:700px) and (min-width:681px){
+  .slide{padding-top:18px;padding-bottom:18px;gap:10px}
+  .chamber,.scale{height:43vh;min-height:270px}
+  .lab-panel{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<main aria-live="polite">
+  <section class="slide hero active" data-title="떨어지는 물체의 속력">
+    <div class="hero-copy">
+      <div class="fall-streak"></div>
+      <div class="eyebrow">3단원 · 운동과 에너지</div>
+      <h1>3단원<br><span class="accent">운동과 에너지</span></h1>
+      <p>(2) 떨어지는 물체의 속력은 어떻게 변할까?</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="image-shell" id="heroShell">
+        <div class="image-fallback">↓</div>
+        <img id="heroImg" src="https://cdn.phototourl.com/free/2026-07-31-b1849006-a42b-4a10-b4cd-8c8093fe4537.jpg" alt="">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide center reveal-slide" data-title="학습 목표">
+    <div class="slide-head">
+      <div class="eyebrow">오늘의 방향</div>
+      <h2>학습 목표</h2>
+    </div>
+    <div class="goal-stack">
+      <article class="goal paper reveal" data-order="1"><div class="goal-num">1</div><p>자유 낙하 운동을 하는 물체의 속력 변화를 설명할 수 있다.</p></article>
+      <article class="goal paper reveal" data-order="2"><div class="goal-num">2</div><p>자유 낙하 운동을 하는 물체의 시간–속력 그래프를 분석할 수 있다.</p></article>
+    </div>
+    <div class="click-hint">화면 클릭 또는 Space로 목표를 확인하세요</div>
+  </section>
+
+  <section class="slide center" data-title="영상 보기">
+    <div class="eyebrow">먼저 관찰하기</div>
+    <h2>영상 속의 사람은 무엇을 하고 있나요?</h2>
+    <div class="video-orb" aria-hidden="true"><div class="play"></div></div>
+    <a class="btn" href="https://www.youtube.com/watch?v=8omdqyOqk1Q" target="_blank" rel="noopener noreferrer">영상 링크</a>
+  </section>
+
+  <section class="slide reveal-slide" data-title="낙하 장면 생각하기">
+    <div class="slide-head"><div class="eyebrow">생각 열기</div><h2>영상 속 사람은 아주 높은 하늘에서 떨어졌습니다.</h2></div>
+    <div class="prompt-layout">
+      <div class="prompt-image paper" id="fallImageShell">
+        <div class="image-fallback">↓</div>
+        <img id="fallImage" src="https://cdn.phototourl.com/free/2026-07-31-2149b650-d525-40a9-8659-4f28f35fd36d.png" alt="높은 하늘에서 떨어지는 사람">
+      </div>
+      <div class="prompt-copy">
+        <div class="reveal reveal-text" data-order="1"><span>이 사람은 떨어지는 도중에 무엇을 할까요?</span></div>
+        <div class="reveal reveal-text" data-order="2"><span>만약 이 사람이 낙하산을 펴지 않는다면 어떻게 될까요?</span></div>
+      </div>
+    </div>
+    <div class="click-hint">질문을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide" data-title="자유 낙하 실험">
+    <div class="slide-head"><div class="eyebrow">직접 탐구하기</div><h2>물체를 직접 떨어뜨리고 속력의 변화를 확인해 봅시다.</h2></div>
+    <div class="lab-layout">
+      <div class="chamber-wrap">
+        <div class="chamber" id="ballChamber" aria-label="높이 60미터의 자유 낙하 실험 공간">
+          <div class="ball" id="dragBall" role="button" tabindex="0" aria-label="드래그하여 떨어뜨리는 당구공"></div>
+          <div class="reference-line" id="ballLine" aria-hidden="true"></div>
+          <div class="floor"></div>
+        </div>
+        <div class="scale" id="ballScale" aria-hidden="true"></div>
+      </div>
+      <aside class="lab-panel paper">
+        <h3>자유 낙하 실험실</h3>
+        <div class="readout" id="ballReadout"><span>시간 0.00 s</span><span>낙하 거리 0.00 m</span><span>속력 0.00 m/s</span></div>
+        <div class="btn-row">
+          <button class="btn" type="button" id="ballPhoto">사진 촬영</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="slide reveal-slide center" data-title="공기 저항">
+    <div class="slide-head"><div class="eyebrow">왜 다르게 떨어질까?</div><h2>지구상의 물체는 중력을 받아 아래 방향으로 떨어집니다.</h2></div>
+    <div class="concept-stack paper">
+      <div class="reveal reveal-text" data-order="1"><span>물체가 다른 힘을 받지 않고 중력만 받아 떨어진다면, 속력은 항상 일정한 비율로 변합니다.</span></div>
+      <div class="reveal reveal-text" data-order="2"><span>하지만 지구에서 실제로 떨어지는 물체는 중력과 함께 <strong>“이것”</strong>의 방해도 받습니다.</span></div>
+      <div class="reveal" data-order="3">
+        <div class="concept-question"><span>“이것”은 무엇일까요?</span></div>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="hintBtn">힌트</button>
+          <button class="btn" type="button" id="answerBtn">답 공개</button>
+        </div>
+      </div>
+      <div class="answer-slot" id="airAnswer">공기</div>
+    </div>
+    <div class="click-hint">설명을 차례대로 확인하세요</div>
+    <div class="hint-stage" id="hintStage" aria-hidden="true">
+      <div class="hint-card paper"><img src="https://i.namu.wiki/i/X1Mc8i_a71rJAxXlJFCO-hJx6mGqk7wsxxxz1AfsbxfDapf5qfXWyAKpJ7qz4-UZrQmMMarzNfAAmOg38cxH3w.webp" alt="공기의 존재를 떠올리게 하는 힌트 이미지"></div>
+    </div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="공기 저항 비교">
+    <div class="slide-head"><div class="eyebrow">실험적 비교</div><h2>실제로 우리가 관찰하는 물체는 모두 공기 저항을 받습니다.</h2></div>
+    <div class="paper-demo">
+      <div class="image paper" id="paperImageShell">
+        <div class="image-fallback">▱</div>
+        <img id="paperImage" src="https://cdn.phototourl.com/free/2026-07-31-cb3783e0-bac4-4859-89f9-7b9e5e5ad020.png" alt="구긴 종이와 구기지 않은 종이의 낙하 비교">
+      </div>
+      <div class="copy">
+        <div class="reveal reveal-text" data-order="1"><span>공기 저항을 받는 정도에 따라 물체가 떨어지는 속력이 달라집니다.</span></div>
+        <div class="reveal reveal-text" data-order="2"><span>똑같은 종이 한 장은 구기고, 다른 한 장은 구기지 않은 채 떨어뜨려 속력의 차이를 확인해 봅시다.</span></div>
+      </div>
+    </div>
+    <div class="click-hint">설명을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide center" data-title="진공 실험 영상">
+    <div class="video-card paper">
+      <div class="eyebrow">공기 저항을 없애면?</div>
+      <p class="lead">과학자들은 공기 저항 없이 중력만 받을 때 물체가 어떻게 떨어지는지 궁금했습니다.<br><span class="accent">(→ 자유 낙하 운동)</span></p>
+      <div class="reveal paired-reveal" data-order="1">
+        <div class="paper video-subtext">그래서 진공 상태의 공간을 만들고,<br>무거운 물체와 가벼운 물체를 동시에 떨어뜨렸습니다.</div>
+        <a class="btn" href="https://www.youtube.com/watch?v=E43-CfukEgs" target="_blank" rel="noopener noreferrer">영상 링크</a>
+      </div>
+    </div>
+    <div class="click-hint">실험 설명과 영상을 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide center" data-title="자유 낙하 연구의 의미">
+    <div class="slide-head"><div class="eyebrow">왜 자유 낙하일까?</div><h2>다른 운동도 아니고, 왜 하필 자유 낙하 운동을 깊이 연구했을까요?</h2></div>
+    <div class="why-panel paper">
+      <div class="reveal reveal-text text-140" data-order="1"><span>자유 낙하 운동은 물체에 다른 힘 없이 오직 <strong>“이 힘”</strong>만 작용합니다.</span></div>
+      <div class="why-force reveal" data-order="2"><span>중력</span></div>
+      <div class="reveal reveal-text text-140" data-order="3"><span>중력이 물체를 어떻게 움직이게 하는지를 정확히 알아볼 수 있습니다.</span></div>
+      <div class="reveal reveal-text text-140" data-order="4"><span>지구상의 모든 물체는 다 중력을 받고 있기에,<br>이걸 알아낸다는 건 지구상의 물체를 움직이는 비밀 중 하나를 풀어내는 것과 같습니다.</span></div>
+    </div>
+    <div class="click-hint">설명을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide" data-title="공기와 진공 비교 실험">
+    <div class="slide-head"><div class="eyebrow">가상 실험</div><h2>과학자들이 측정한 결과를 확인해 봅시다.</h2></div>
+    <div id="experimentHostMain">
+    <div class="lab-layout" id="vacuumLab">
+      <div class="chamber-wrap">
+        <div class="chamber dual-gaps" id="vacuumChamber" aria-label="높이 80미터의 공기와 진공 낙하 비교 공간">
+          <div class="air-particles" id="airParticles" aria-hidden="true"></div>
+          <div class="object-label" id="bowlingLabel">볼링공</div>
+          <div class="object-label" id="featherLabel">깃털</div>
+          <div class="bowling" id="bowlingBall" aria-hidden="true"></div>
+          <div class="feather" id="feather" aria-hidden="true"></div>
+          <div class="reference-line" id="bowlingLine" aria-hidden="true"></div>
+          <div class="reference-line" id="featherLine" aria-hidden="true"></div>
+          <div class="floor"></div>
+        </div>
+        <div class="scale" id="vacuumScale" aria-hidden="true"></div>
+      </div>
+      <aside class="lab-panel paper">
+        <h3>낙하 비교 실험실</h3>
+        <div class="switch-wrap">
+          <span>공기 중</span>
+          <label class="switch">
+            <input id="vacuumSwitch" type="checkbox" role="switch" aria-label="공기 중과 진공 전환">
+            <span class="switch-ui"></span>
+          </label>
+          <span>진공</span>
+        </div>
+        <div class="readout" id="vacuumReadout"><span>상태: 공기 중</span><span>시간 0.00 s</span><span>볼링공 0.00 m · 깃털 0.00 m</span></div>
+        <div class="btn-row">
+          <button class="btn" type="button" id="dropBoth">낙하</button>
+          <button class="btn secondary" type="button" id="resetBoth">초기화</button>
+          <button class="btn secondary" type="button" id="photoBoth">사진 촬영</button>
+          <button class="btn secondary" type="button" id="gapsBoth">간격 표시</button>
+        </div>
+      </aside>
+    </div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="실험 결과 기록과 분석">
+    <div class="slide-head"><div class="eyebrow">기록하고 분석하기</div><h2>실험 결과를 기록하고 분석해봅시다.</h2></div>
+    <div class="analysis-grid">
+      <div class="analysis-experiment" id="experimentHostAnalysis"></div>
+      <div class="analysis-side">
+        <table class="result-table" aria-label="자유 낙하 실험 결과 기록표">
+          <tr><th>시간 구간</th><th>0~1초</th><th>1~2초</th><th>2~3초</th><th>3~4초</th></tr>
+          <tr><th>각 시간 구간에서의 이동거리(m)</th><td><span class="table-answer">4.9</span></td><td><span class="table-answer">14.7</span></td><td><span class="table-answer">24.5</span></td><td><span class="table-answer">34.3</span></td></tr>
+          <tr><th>속력(m/s)</th><td><span class="table-answer">9.8</span></td><td><span class="table-answer">19.6</span></td><td><span class="table-answer">29.4</span></td><td><span class="table-answer">39.2</span></td></tr>
+          <tr><th>이전 시간 구간과의 속력 차이</th><td><span class="table-answer">✕</span></td><td><span class="table-answer">9.8</span></td><td><span class="table-answer">9.8</span></td><td><span class="table-answer">9.8</span></td></tr>
+        </table>
+        <div class="graph-card" id="analysisGraph">
+          <svg viewBox="0 0 420 270" role="img" aria-label="시간에 따른 속력 그래프 좌표축">
+            <g stroke="rgba(60,186,149,.22)" stroke-width="1">
+              <path d="M52 226H382M52 205H382M52 184H382M52 163H382M52 142H382M52 121H382M52 100H382M52 79H382M52 58H382M52 37H382"/>
+              <path d="M52 226V28M122 226V28M192 226V28M262 226V28M332 226V28"/>
+            </g>
+            <g fill="none" stroke="#2c3e3a" stroke-width="2"><path d="M52 24V226H388"/><path d="m48 31 4-7 4 7M381 222l7 4-7 4"/></g>
+            <g fill="#627973" font-size="11" text-anchor="middle"><text x="52" y="243">0</text><text x="122" y="243">1</text><text x="192" y="243">2</text><text x="262" y="243">3</text><text x="332" y="243">4</text></g>
+            <g fill="#627973" font-size="10" text-anchor="end"><text x="47" y="229">0</text><text x="47" y="208">4.9</text><text x="47" y="187">9.8</text><text x="47" y="166">14.7</text><text x="47" y="145">19.6</text><text x="47" y="124">24.5</text><text x="47" y="103">29.4</text><text x="47" y="82">34.3</text><text x="47" y="61">39.2</text></g>
+            <g fill="#2c3e3a" font-size="12" font-weight="800"><text x="337" y="260">시간(s)</text><text x="8" y="18">속력(m/s)</text></g>
+            <path class="answer-line" d="M52 226L332 58" fill="none" stroke="#3cba95" stroke-width="5" stroke-linecap="round"/>
+          </svg>
+          <div class="btn-row"><button class="btn secondary" type="button" id="graphAnswer">정답</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide reveal-slide center summary-slide" data-title="중력 가속도">
+    <div class="slide-head"><div class="eyebrow">실험 결과</div><h2>물체의 속력은 1초마다 <span class="accent">9.8m/s</span>씩 증가했습니다.</h2></div>
+    <div class="summary-panel paper">
+      <div class="reveal reveal-text text-140" data-order="1"><span>이 값은 다른 힘이 아니라 <strong class="accent">오직 중력때문에</strong> 물체가 가속되는 정도를 나타냅니다.</span></div>
+      <div class="reveal summary-detail" data-order="2">
+        <p class="body summary-text-140">그래서 과학자들은 공기 저항을 받지 않고 자유 낙하하는 물체는 그 질량과 크기에 관계 없이 모두 1초에 9.8m/s씩 속력이 증가한다는 것을 알아냈습니다.</p>
+        <img class="summary-image" src="https://cdn.phototourl.com/free/2026-08-03-a918f665-3580-4f77-b59e-5b1b281e1559.png" alt="중력 가속도 설명 이미지">
+        <button class="btn" type="button" id="gInfo">9.8</button>
+      </div>
+    </div>
+    <div class="click-hint">설명을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide center" data-title="자유 낙하 운동 정리">
+    <div class="slide-head"><div class="eyebrow">핵심 정리</div><h2>자유 낙하 운동</h2></div>
+    <div class="definition-panel paper">
+      <p class="lead definition-lead">공중에 정지해 있던 물체가, <span class="accent">중력만을 받아</span> 떨어지는 운동</p>
+      <p class="body definition-subtext">물체의 질량에 관계없이, 속력이 1초마다 <strong class="accent">9.8m/s</strong>씩 증가한다.</p>
+      <div class="slide13-visuals">
+      <div class="final-graph slide13-graph paper">
+        <svg viewBox="0 0 520 320" role="img" aria-label="자유 낙하 운동의 시간 속력 그래프">
+          <g stroke="rgba(60,186,149,.22)" stroke-width="1">
+            <path d="M70 260H370M70 210H370M70 160H370M70 110H370M70 60H370M70 10H370"/>
+            <path d="M70 260V10M120 260V10M170 260V10M220 260V10M270 260V10M320 260V10M370 260V10"/>
+          </g>
+          <g fill="none" stroke="#2c3e3a" stroke-width="2"><path d="M70 8V260H382"/><path d="m66 17 4-9 4 9M373 256l9 4-9 4"/></g>
+          <g fill="#627973" font-size="12" text-anchor="middle"><text x="70" y="278">0</text><text x="120" y="278">1</text><text x="170" y="278">2</text><text x="220" y="278">3</text><text x="270" y="278">4</text><text x="320" y="278">5</text></g>
+          <g fill="#627973" font-size="12" text-anchor="end"><text x="64" y="264">0</text><text x="64" y="214">9.8</text><text x="64" y="164">19.6</text><text x="64" y="114">29.4</text><text x="64" y="64">39.2</text></g>
+          <g fill="#2c3e3a" font-size="14" font-weight="800"><text x="330" y="302">시간(s)</text><text x="8" y="18">속력(m/s)</text></g>
+          <path d="M70 260L320 10" fill="none" stroke="#3cba95" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <img class="slide13-image" src="https://cdn.phototourl.com/free/2026-08-04-93b16c7f-c169-43de-8737-c827435649eb.png" alt="자유 낙하 운동 설명 이미지">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide center" data-title="자유 낙하 연구의 활용">
+    <div class="slide-head"><div class="eyebrow">생활과 기술 속 과학</div><h2>자유 낙하 운동과 중력 가속도를 연구한 덕분에 이런 게 만들어졌습니다.</h2></div>
+    <div class="application-grid">
+      <article class="application-card paper"><h3>낙하산</h3><img src="https://i.namu.wiki/i/X1Mc8i_a71rJAxXlJFCO-hJx6mGqk7wsxxxz1AfsbxfDapf5qfXWyAKpJ7qz4-UZrQmMMarzNfAAmOg38cxH3w.webp" alt="낙하산"></article>
+      <article class="application-card paper"><h3>드론</h3><img src="https://www.etri.re.kr/webzine/20190426/common/images/sub03_01.jpg" alt="드론"></article>
+      <article class="application-card paper"><h3>로켓</h3><a href="https://www.youtube.com/watch?v=RYUr-5PYA7s" target="_blank" rel="noopener noreferrer" aria-label="로켓 영상 열기"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/SpaceX_Starship_ignition_during_IFT-5.jpg/1280px-SpaceX_Starship_ignition_during_IFT-5.jpg" alt="로켓"></a></article>
+    </div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="오늘 배운 개념 정리">
+    <div class="slide-head"><div class="eyebrow">개념 확인</div><h2>오늘 배운 개념을 정리해봅시다.</h2></div>
+    <ol class="review-list paper">
+      <li>공중에 정지해있던 물체가, 공기 저항을 받지 않고 중력만을 받아 떨어지는 운동은? <span class="inline-answer reveal" data-order="1">(자유 낙하 운동)</span></li>
+      <li><span class="inline-answer reveal" data-order="2">(자유 낙하 운동)</span>하는 물체의 속력은 떨어지면서 1초에 <span class="inline-answer reveal" data-order="3">(9.8)</span>m/s씩 빨라진다.</li>
+      <li>중력이 물체의 질량과 크기에 관계없이 1초에 <span class="inline-answer reveal" data-order="4">(9.8)</span>m/s씩 속력을 증가시키므로 <span class="inline-answer reveal" data-order="5">(9.8)</span>을 <span class="inline-answer reveal" data-order="6">(중력 가속도 상수)</span>라고 한다.</li>
+      <li>진공 상태의 똑같은 1m 높이에서 떨어뜨렸을 때 탁구공, 볼링공, 깃털 중 가장 늦게 떨어지는 물체는? <span class="inline-answer reveal" data-order="7">(다 똑같이 떨어진다.)</span></li>
+      <li>공기 중에서 똑같은 1m 높이에서 떨어뜨렸을 때 탁구공, 볼링공, 깃털 중 가장 늦게 떨어지는 물체는? <span class="inline-answer reveal" data-order="8">(깃털)</span></li>
+      <li>공기 중에서 늦게 떨어지는 물체는 이유가 뭔가요? <span class="inline-answer reveal" data-order="9">(공기 저항을 많이 받기 때문에)</span></li>
+    </ol>
+    <div class="click-hint">정답을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide center area-slide" data-title="그래프 아래 넓이와 이동 거리">
+    <div class="slide-head"><div class="eyebrow">지난 시간과 연결하기</div><h2>지난 시간에 배운 이게 여기서도 맞을까요?</h2></div>
+    <p class="area-lead">그래프 아랫부분의 넓이 = 이동 거리 <span class="inline-answer reveal" data-order="1">(자유 낙하 운동 그래프에서도 맞습니다.)</span></p>
+    <div class="area-graph-wrap">
+      <div class="final-graph paper" id="areaGraph"></div>
+      <button class="btn secondary" type="button" id="areaToggle" aria-pressed="false">면적 표시</button>
+    </div>
+    <p class="area-detail reveal" data-order="2"><span>자유 낙하 운동의 시간-속력 그래프에서도 그래프 아래 면적을 계산하면 이동 거리를 알 수 있습니다.</span></p>
+    <div class="click-hint">설명을 차례대로 확인하세요</div>
+  </section>
+</main>
+
+<dialog class="info-dialog" id="gDialog">중력 가속도 상수 = 9.8<br><br><span class="body">(중력은 떨어지는 물체의 속력을 1초에 9.8m/s씩 증가시킨다.)</span></dialog>
+
+<nav class="nav" aria-label="슬라이드 탐색">
+  <button type="button" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+  <div class="progress" aria-hidden="true"><i id="progressFill"></i></div>
+  <div class="counter" id="counter">01 / 13</div>
+  <button type="button" id="nextBtn" aria-label="다음 슬라이드">›</button>
+  <button type="button" id="fullscreenBtn" aria-label="전체 화면">⛶</button>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const slides=$$(".slide");
+const counter=$("#counter");
+const progressFill=$("#progressFill");
+const toast=$("#toast");
+let index=0;
+let toastTimer=0;
+let ballFrame=0;
+let vacuumFrame=0;
+
+function say(message){
+  toast.textContent=message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove("show"),1700);
+}
+
+function nextReveal(slide){
+  const item=$$(".reveal").filter(el=>el.closest(".slide")===slide).sort((a,b)=>(+a.dataset.order||0)-(+b.dataset.order||0)).find(el=>!el.classList.contains("visible"));
+  if(!item)return false;
+  item.classList.add("visible");
+  return true;
+}
+
+function updateProgress(){
+  const percent=(index+1)/slides.length*100;
+  counter.textContent=`${String(index+1).padStart(2,"0")} / ${String(slides.length).padStart(2,"0")}`;
+  if(innerWidth<=680){
+    progressFill.style.width=percent+"%";
+    progressFill.style.height="100%";
+  }else{
+    progressFill.style.height=percent+"%";
+    progressFill.style.width="100%";
+  }
+}
+
+function stopAnimations(){
+  cancelAnimationFrame(ballFrame);
+  cancelAnimationFrame(vacuumFrame);
+  ballFrame=0;
+  vacuumFrame=0;
+  ballState.running=false;
+  vacuumState.running=false;
+}
+
+function go(to){
+  if(to<0||to>=slides.length||to===index)return;
+  stopAnimations();
+  slides[index].classList.remove("active");
+  index=to;
+  slides[index].classList.add("active");
+  document.title=`${index+1}. ${slides[index].dataset.title} · 운동과 에너지`;
+  if(index===4)layoutBall();
+  if(index===9||index===10){mountVacuumLab(index===10);layoutVacuum()}
+  updateProgress();
+}
+
+$("#prevBtn").onclick=()=>go(index-1);
+$("#nextBtn").onclick=()=>go(index+1);
+$("#fullscreenBtn").onclick=async()=>{
+  try{
+    document.fullscreenElement?await document.exitFullscreen():await document.documentElement.requestFullscreen();
+  }catch{
+    say("이 브라우저에서는 전체 화면을 사용할 수 없습니다.");
+  }
+};
+addEventListener("keydown",event=>{
+  if(event.key==="ArrowLeft"||event.key==="PageUp"){event.preventDefault();go(index-1)}
+  if(event.key==="ArrowRight"||event.key==="PageDown"){event.preventDefault();go(index+1)}
+  if(event.key===" "){
+    event.preventDefault();
+    if(!nextReveal(slides[index]))go(index+1);
+  }
+  if(event.key==="Home")go(0);
+  if(event.key==="End")go(slides.length-1);
+});
+slides.forEach(slide=>slide.addEventListener("click",event=>{
+  if(!event.target.closest("button,a,input,label,.ball")&&slide.classList.contains("reveal-slide"))nextReveal(slide);
+}));
+let swipe=null;
+document.addEventListener("pointerdown",event=>{
+  if(!event.target.closest("button,a,input,label,.ball"))swipe={x:event.clientX,y:event.clientY,id:event.pointerId};
+});
+document.addEventListener("pointerup",event=>{
+  if(!swipe||swipe.id!==event.pointerId)return;
+  const dx=event.clientX-swipe.x,dy=event.clientY-swipe.y;
+  swipe=null;
+  if(Math.abs(dx)>75&&Math.abs(dx)>Math.abs(dy)*1.35)go(index+(dx<0?1:-1));
+});
+
+function imageReady(img,shell){
+  img.addEventListener("load",()=>shell.classList.add("loaded"));
+  img.addEventListener("error",()=>img.style.display="none");
+  if(img.complete&&img.naturalWidth)shell.classList.add("loaded");
+}
+imageReady($("#heroImg"),$("#heroShell"));
+imageReady($("#fallImage"),$("#fallImageShell"));
+imageReady($("#paperImage"),$("#paperImageShell"));
+
+const hintBtn=$("#hintBtn");
+const hintStage=$("#hintStage");
+const showHint=()=>{hintStage.classList.add("show");hintStage.setAttribute("aria-hidden","false")};
+const hideHint=()=>{hintStage.classList.remove("show");hintStage.setAttribute("aria-hidden","true")};
+hintBtn.addEventListener("pointerdown",event=>{event.preventDefault();hintBtn.setPointerCapture(event.pointerId);showHint()});
+hintBtn.addEventListener("pointerup",hideHint);
+hintBtn.addEventListener("pointercancel",hideHint);
+hintBtn.addEventListener("lostpointercapture",hideHint);
+hintBtn.addEventListener("keydown",event=>{if(event.key===" "||event.key==="Enter")showHint()});
+hintBtn.addEventListener("keyup",hideHint);
+$("#answerBtn").onclick=()=>$("#airAnswer").classList.add("open");
+
+function makeScale(element,max,step){
+  element.innerHTML="";
+  for(let value=0;value<=max;value+=step){
+    const mark=document.createElement("span");
+    mark.textContent=`${value} m`;
+    mark.style.top=`${value/max*100}%`;
+    element.appendChild(mark);
+  }
+}
+makeScale($("#ballScale"),60,10);
+makeScale($("#vacuumScale"),80,10);
+
+/* Slide 5: draggable free-fall ball */
+const ballChamber=$("#ballChamber");
+const dragBall=$("#dragBall");
+const ballLine=$("#ballLine");
+const ballReadout=$("#ballReadout");
+const ballState={x:0,y:0,startX:0,startY:0,vx:0,vy:0,startTime:0,running:false,dragging:false,lastX:0,lastTime:0,nextGhost:0,photo:false,diameter:0};
+
+function ballGeometry(){
+  const rect=ballChamber.getBoundingClientRect();
+  const diameter=rect.height*(3/60);
+  return{rect,diameter,ppm:rect.height/60,floorY:rect.height-diameter};
+}
+function setBallVisual(){
+  const g=ballGeometry();
+  ballState.diameter=g.diameter;
+  dragBall.style.width=g.diameter+"px";
+  dragBall.style.height=g.diameter+"px";
+  dragBall.style.left=ballState.x+"px";
+  dragBall.style.top=ballState.y+"px";
+  ballLine.style.left=ballState.x+"px";
+  ballLine.style.top=(ballState.y+g.diameter-1)+"px";
+  ballLine.style.width=g.diameter+"px";
+}
+function clearBallArtifacts(){
+  ballChamber.querySelectorAll(".ghost,.gap-mark").forEach(el=>el.remove());
+  ballChamber.classList.remove("show-gaps");
+}
+function updateBallReadout(time=0,distance=0,speed=0){
+  ballReadout.innerHTML=`<span>시간 ${time.toFixed(2)} s</span><span>낙하 거리 ${distance.toFixed(2)} m</span><span>속력 ${speed.toFixed(2)} m/s</span>`;
+}
+function layoutBall(){
+  const g=ballGeometry();
+  ballState.x=Math.max(0,Math.min(g.rect.width-g.diameter,ballState.x));
+  ballState.y=Math.max(0,Math.min(g.floorY,ballState.y));
+  setBallVisual();
+}
+function resetBall(){
+  cancelAnimationFrame(ballFrame);
+  ballState.running=false;
+  clearBallArtifacts();
+  const g=ballGeometry();
+  ballState.x=Math.max(12,g.rect.width*.22);
+  ballState.y=Math.max(10,g.rect.height*.06);
+  ballState.vx=0;
+  ballState.vy=0;
+  updateBallReadout();
+  setBallVisual();
+}
+function addBallGhost(y,meters){
+  const g=ballGeometry();
+  const ghost=document.createElement("div");
+  ghost.className="ghost";
+  ghost.dataset.meters=meters.toFixed(4);
+  ghost.style.left=ballState.x+"px";
+  ghost.style.top=y+"px";
+  ghost.style.width=g.diameter+"px";
+  ghost.style.height=g.diameter+"px";
+  ballChamber.appendChild(ghost);
+}
+function startBall(photo=false,initialVx=0){
+  cancelAnimationFrame(ballFrame);
+  clearBallArtifacts();
+  const g=ballGeometry();
+  if(ballState.y>=g.floorY-1){
+    ballState.x=Math.max(12,g.rect.width*.22);
+    ballState.y=Math.max(10,g.rect.height*.06);
+  }
+  ballState.startX=ballState.x;
+  ballState.startY=ballState.y;
+  ballState.vx=initialVx;
+  ballState.vy=0;
+  ballState.startTime=performance.now();
+  ballState.running=true;
+  ballState.photo=photo;
+  ballState.nextGhost=0;
+  if(photo)addBallGhost(ballState.y,0);
+  const animate=now=>{
+    if(!ballState.running)return;
+    const geo=ballGeometry();
+    const time=(now-ballState.startTime)/1000;
+    const startMeters=ballState.startY/geo.ppm;
+    const fallMeters=.5*9.8*time*time;
+    const y=Math.min(geo.floorY,(startMeters+fallMeters)*geo.ppm);
+    let x=ballState.startX+ballState.vx*time;
+    const width=geo.rect.width-geo.diameter;
+    if(width>0){
+      const cycle=width*2;
+      x=((x%cycle)+cycle)%cycle;
+      if(x>width)x=cycle-x;
+    }
+    ballState.x=x;
+    ballState.y=y;
+    if(photo){
+      while(time>=ballState.nextGhost+1&&y<geo.floorY){
+        ballState.nextGhost+=1;
+        const ghostMeters=.5*9.8*ballState.nextGhost*ballState.nextGhost;
+        const ghostY=Math.min(geo.floorY,(startMeters+ghostMeters)*geo.ppm);
+        addBallGhost(ghostY,ghostMeters);
+      }
+    }
+    setBallVisual();
+    const actualFall=(ballState.y-ballState.startY)/geo.ppm;
+    updateBallReadout(time,actualFall,Math.sqrt(Math.max(0,2*9.8*actualFall)));
+    if(y<geo.floorY){
+      ballFrame=requestAnimationFrame(animate);
+    }else{
+      ballState.running=false;
+      updateBallReadout(Math.sqrt(Math.max(0,2*actualFall/9.8)),actualFall,Math.sqrt(2*9.8*actualFall));
+    }
+  };
+  ballFrame=requestAnimationFrame(animate);
+}
+dragBall.addEventListener("pointerdown",event=>{
+  event.preventDefault();
+  cancelAnimationFrame(ballFrame);
+  ballState.running=false;
+  clearBallArtifacts();
+  ballState.dragging=true;
+  dragBall.classList.add("dragging");
+  dragBall.setPointerCapture(event.pointerId);
+  const rect=ballChamber.getBoundingClientRect();
+  ballState.lastX=event.clientX;
+  ballState.lastTime=performance.now();
+  ballState.vx=0;
+  const move=moveEvent=>{
+    if(!ballState.dragging)return;
+    const g=ballGeometry();
+    const now=performance.now();
+    const dt=Math.max(.016,(now-ballState.lastTime)/1000);
+    ballState.vx=(moveEvent.clientX-ballState.lastX)/dt;
+    ballState.lastX=moveEvent.clientX;
+    ballState.lastTime=now;
+    ballState.x=Math.max(0,Math.min(g.rect.width-g.diameter,moveEvent.clientX-rect.left-g.diameter/2));
+    ballState.y=Math.max(0,Math.min(g.floorY,moveEvent.clientY-rect.top-g.diameter/2));
+    setBallVisual();
+    updateBallReadout(0,0,0);
+  };
+  const end=endEvent=>{
+    if(!ballState.dragging)return;
+    ballState.dragging=false;
+    dragBall.classList.remove("dragging");
+    dragBall.removeEventListener("pointermove",move);
+    dragBall.removeEventListener("pointerup",end);
+    dragBall.removeEventListener("pointercancel",end);
+    try{dragBall.releasePointerCapture(endEvent.pointerId)}catch{}
+    startBall(false,ballState.vx);
+  };
+  dragBall.addEventListener("pointermove",move);
+  dragBall.addEventListener("pointerup",end);
+  dragBall.addEventListener("pointercancel",end);
+});
+dragBall.addEventListener("keydown",event=>{
+  const g=ballGeometry();
+  if(event.key==="Enter"||event.key===" "){event.preventDefault();startBall(false)}
+  if(event.key==="ArrowLeft"){event.preventDefault();ballState.x=Math.max(0,ballState.x-10);setBallVisual()}
+  if(event.key==="ArrowRight"){event.preventDefault();ballState.x=Math.min(g.rect.width-g.diameter,ballState.x+10);setBallVisual()}
+  if(event.key==="ArrowUp"){event.preventDefault();ballState.y=Math.max(0,ballState.y-10);setBallVisual()}
+  if(event.key==="ArrowDown"){event.preventDefault();ballState.y=Math.min(g.floorY,ballState.y+10);setBallVisual()}
+});
+$("#ballPhoto").onclick=()=>startBall(true);
+/* Slide 10: air/vacuum comparison */
+const vacuumChamber=$("#vacuumChamber");
+const bowlingBall=$("#bowlingBall");
+const feather=$("#feather");
+const bowlingLine=$("#bowlingLine");
+const featherLine=$("#featherLine");
+const bowlingLabel=$("#bowlingLabel");
+const featherLabel=$("#featherLabel");
+const vacuumSwitch=$("#vacuumSwitch");
+const vacuumReadout=$("#vacuumReadout");
+const vacuumState={running:false,startTime:0,photo:false,nextGhost:0,bowlingY:0,featherY:0,size:38};
+
+function mountVacuumLab(forAnalysis){
+  $(forAnalysis?"#experimentHostAnalysis":"#experimentHostMain").appendChild($("#vacuumLab"));
+}
+
+for(let i=0;i<24;i++){
+  const p=document.createElement("i");
+  p.className="air-particle";
+  p.style.left=(5+(i*37)%90)+"%";
+  p.style.top=(5+(i*53)%88)+"%";
+  p.style.animationDelay=(-i*.21)+"s";
+  $("#airParticles").appendChild(p);
+}
+function vacuumGeometry(){
+  const rect=vacuumChamber.getBoundingClientRect();
+  const size=Math.max(30,Math.min(48,rect.height*.085));
+  return{rect,size,ppm:(rect.height-size)/80,floorY:rect.height-size};
+}
+function setObject(el,line,label,x,y,size){
+  el.style.width=size+"px";
+  el.style.height=size+"px";
+  el.style.left=(x-size/2)+"px";
+  el.style.top=y+"px";
+  line.style.left=(x-size/2)+"px";
+  line.style.top=(y+size-1)+"px";
+  line.style.width=size+"px";
+  label.style.left=x+"px";
+  label.style.top=y+"px";
+}
+function setVacuumVisual(){
+  const g=vacuumGeometry();
+  vacuumState.size=g.size;
+  setObject(bowlingBall,bowlingLine,bowlingLabel,g.rect.width*.32,vacuumState.bowlingY,g.size);
+  setObject(feather,featherLine,featherLabel,g.rect.width*.68,vacuumState.featherY,g.size);
+}
+function updateVacuumReadout(time=0,bowlingMeters=0,featherMeters=0){
+  vacuumReadout.innerHTML=`<span>상태: ${vacuumSwitch.checked?"진공":"공기 중"}</span><span>시간 ${time.toFixed(2)} s</span><span>볼링공 ${bowlingMeters.toFixed(2)} m · 깃털 ${featherMeters.toFixed(2)} m</span>`;
+}
+function clearVacuumArtifacts(){
+  vacuumChamber.querySelectorAll(".ghost,.gap-mark").forEach(el=>el.remove());
+  vacuumChamber.classList.remove("show-gaps");
+  $("#gapsBoth").classList.remove("active");
+  $("#gapsBoth").textContent="간격 표시";
+}
+function layoutVacuum(){
+  const g=vacuumGeometry();
+  vacuumState.bowlingY=Math.min(g.floorY,vacuumState.bowlingY);
+  vacuumState.featherY=Math.min(g.floorY,vacuumState.featherY);
+  setVacuumVisual();
+}
+function resetVacuum(keepMode=true){
+  cancelAnimationFrame(vacuumFrame);
+  vacuumState.running=false;
+  clearVacuumArtifacts();
+  if(!keepMode)vacuumSwitch.checked=false;
+  vacuumChamber.classList.toggle("vacuum",vacuumSwitch.checked);
+  vacuumState.bowlingY=0;
+  vacuumState.featherY=0;
+  updateVacuumReadout();
+  setVacuumVisual();
+}
+function addVacuumGhost(kind,y,meters){
+  const g=vacuumGeometry();
+  const previous=[...vacuumChamber.querySelectorAll(`.ghost[data-kind="${kind}"]`)].at(-1);
+  if(previous&&+previous.dataset.meters===+meters.toFixed(4))return;
+  const ghost=document.createElement("div");
+  ghost.className=`ghost ${kind==="feather"?"feather-ghost":""}`;
+  ghost.dataset.kind=kind;
+  ghost.dataset.meters=meters.toFixed(4);
+  ghost.style.left=((kind==="bowling"?g.rect.width*.32:g.rect.width*.68)-g.size/2)+"px";
+  ghost.style.top=y+"px";
+  ghost.style.width=g.size+"px";
+  ghost.style.height=g.size+"px";
+  vacuumChamber.appendChild(ghost);
+  rebuildVacuumGapMarks();
+}
+function rebuildVacuumGapMarks(){
+  vacuumChamber.querySelectorAll(".gap-mark").forEach(el=>el.remove());
+  const g=vacuumGeometry();
+  const ghosts=[...vacuumChamber.querySelectorAll('.ghost[data-kind="bowling"]')].sort((a,b)=>+a.dataset.meters-+b.dataset.meters);
+  for(let i=1;i<ghosts.length&&i<=4;i++){
+    const a=+ghosts[i-1].dataset.meters,b=+ghosts[i].dataset.meters,gap=b-a;
+    const top=parseFloat(ghosts[i-1].style.top)+g.size/2;
+    const bottom=parseFloat(ghosts[i].style.top)+g.size/2;
+    const mark=document.createElement("div");
+    mark.className="gap-mark";
+    mark.style.left=(g.rect.width*.32+g.size/2+3)+"px";
+    mark.style.top=top+"px";
+    mark.style.height=Math.max(18,bottom-top)+"px";
+    mark.innerHTML=`<svg viewBox="0 0 38 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,0 34,50 0,100"/></svg><span>${gap.toFixed(1)} m</span>`;
+    vacuumChamber.appendChild(mark);
+  }
+}
+function startVacuum(photo=false){
+  resetVacuum(true);
+  const isVacuum=vacuumSwitch.checked;
+  vacuumState.running=true;
+  vacuumState.photo=photo;
+  vacuumState.nextGhost=0;
+  vacuumState.startTime=performance.now();
+  if(photo){
+    addVacuumGhost("bowling",0,0);
+    addVacuumGhost("feather",0,0);
+  }
+  const animate=now=>{
+    if(!vacuumState.running)return;
+    const g=vacuumGeometry();
+    const time=(now-vacuumState.startTime)/1000;
+    const bowlingMeters=Math.min(80,.5*9.8*time*time);
+    const featherMeters=Math.min(80,.5*(isVacuum?9.8:9.8/6)*time*time);
+    vacuumState.bowlingY=bowlingMeters*g.ppm;
+    vacuumState.featherY=featherMeters*g.ppm;
+    if(photo){
+      while(time>=vacuumState.nextGhost+1){
+        vacuumState.nextGhost+=1;
+        const t=vacuumState.nextGhost;
+        const bm=Math.min(80,.5*9.8*t*t);
+        const fm=Math.min(80,.5*(isVacuum?9.8:9.8/6)*t*t);
+        addVacuumGhost("bowling",bm*g.ppm,bm);
+        addVacuumGhost("feather",fm*g.ppm,fm);
+        if(bm>=80&&fm>=80)break;
+      }
+    }
+    setVacuumVisual();
+    updateVacuumReadout(time,bowlingMeters,featherMeters);
+    if(bowlingMeters<80||featherMeters<80){
+      vacuumFrame=requestAnimationFrame(animate);
+    }else{
+      vacuumState.running=false;
+    }
+  };
+  vacuumFrame=requestAnimationFrame(animate);
+}
+vacuumSwitch.addEventListener("change",()=>{
+  resetVacuum(true);
+  vacuumChamber.classList.toggle("vacuum",vacuumSwitch.checked);
+  if(!vacuumSwitch.checked){
+    vacuumChamber.classList.add("air-enter");
+    setTimeout(()=>vacuumChamber.classList.remove("air-enter"),700);
+  }
+  say(vacuumSwitch.checked?"진공 상태":"공기 중 상태");
+});
+$("#dropBoth").onclick=()=>startVacuum(false);
+$("#photoBoth").onclick=()=>startVacuum(true);
+$("#gapsBoth").onclick=()=>{
+  const shown=vacuumChamber.classList.toggle("show-gaps");
+  $("#gapsBoth").classList.toggle("active",shown);
+  $("#gapsBoth").textContent=shown?"간격 숨기기":"간격 표시";
+};
+$("#resetBoth").onclick=()=>resetVacuum(false);
+
+const graphAnswer=$("#graphAnswer");
+const analysisGraph=$("#analysisGraph");
+const resultTable=$(".result-table");
+const showGraphAnswer=()=>{analysisGraph.classList.add("show-answer");resultTable.classList.add("show-answer")};
+const hideGraphAnswer=()=>{analysisGraph.classList.remove("show-answer");resultTable.classList.remove("show-answer")};
+graphAnswer.addEventListener("pointerdown",showGraphAnswer);
+graphAnswer.addEventListener("pointerup",hideGraphAnswer);
+graphAnswer.addEventListener("pointercancel",hideGraphAnswer);
+graphAnswer.addEventListener("pointerleave",hideGraphAnswer);
+graphAnswer.addEventListener("keydown",event=>{if(event.key===" "||event.key==="Enter")showGraphAnswer()});
+graphAnswer.addEventListener("keyup",hideGraphAnswer);
+
+const gDialog=$("#gDialog");
+$("#gInfo").onclick=()=>gDialog.showModal();
+gDialog.onclick=()=>gDialog.close();
+
+const areaGraph=$("#areaGraph");
+const areaSvg=$(".slide13-graph svg").cloneNode(true);
+const areaFill=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+areaFill.setAttribute("class","area-fill");
+areaFill.setAttribute("points","70,260 320,10 320,260");
+areaSvg.setAttribute("aria-label","자유 낙하 운동의 시간 속력 그래프와 아래 면적");
+areaSvg.insertBefore(areaFill,areaSvg.querySelector('path[stroke="#3cba95"]'));
+areaGraph.appendChild(areaSvg);
+$("#areaToggle").onclick=()=>{
+  const shown=areaGraph.classList.toggle("show-area");
+  $("#areaToggle").setAttribute("aria-pressed",shown);
+  $("#areaToggle").textContent=shown?"면적 숨기기":"면적 표시";
+};
+
+addEventListener("resize",()=>{
+  updateProgress();
+  if(index===4)layoutBall();
+  if(index===9||index===10)layoutVacuum();
+});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopAnimations()});
+resetBall();
+resetVacuum(false);
+updateProgress();
+})();
+</script>
+
+<script>
+/* Screen Wake Lock: keep the display awake while this lesson page is active. */
+(() => {
+  let wakeLock = null;
+
+  async function requestWakeLock() {
+    if (!('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+    try {
+      if (wakeLock) return;
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch (err) {
+      wakeLock = null;
+      console.debug('Screen Wake Lock request was not granted:', err);
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') requestWakeLock();
+  });
+
+  // Some browsers are more reliable after a user gesture.
+  ['pointerdown', 'keydown', 'touchstart'].forEach(type => {
+    document.addEventListener(type, requestWakeLock, { passive: true, once: true });
+  });
+
+  window.addEventListener('pageshow', requestWakeLock);
+  requestWakeLock();
+})();
+</script>
+</body>
+</html>
