@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef5f3">
+<title>움직이는 물체가 갖는 에너지 · 운동과 에너지</title>
+<style>
+:root{--bg:#eef5f3;--paper:rgba(255,255,255,.88);--ink:#2c3e3a;--muted:#627973;--teal:#3cba95;--deep:#13765f;--sage:#7faaa1;--red:#ff6b6b;--green:#95e06c;--dark:#122b27;--line:rgba(44,62,58,.14);--shadow:0 18px 55px rgba(35,72,64,.15);--radius:clamp(18px,2.2vw,34px)}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{color:var(--ink);background:var(--bg);font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;word-break:keep-all}button,a{font:inherit}button:focus-visible,a:focus-visible{outline:4px solid rgba(60,186,149,.38);outline-offset:3px}
+#app{width:100%;height:100%;background:radial-gradient(circle at 12% 8%,rgba(60,186,149,.18),transparent 31%),radial-gradient(circle at 88% 90%,rgba(127,170,161,.23),transparent 35%),linear-gradient(rgba(60,186,149,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(60,186,149,.045) 1px,transparent 1px),var(--bg);background-size:auto,auto,32px 32px,32px 32px,auto}
+.slide{position:absolute;inset:0;display:grid;align-content:center;gap:clamp(10px,1.6vw,24px);padding:clamp(22px,3.5vw,56px) clamp(82px,8vw,136px) clamp(22px,3.4vw,52px) clamp(24px,5vw,84px);opacity:0;visibility:hidden;pointer-events:none;transform:translateX(4%);transition:.45s ease}.slide::before{content:"";position:absolute;inset:clamp(12px,2vw,28px);border:1px solid rgba(60,186,149,.17);border-radius:var(--radius);pointer-events:none}.slide.active{opacity:1;visibility:visible;pointer-events:auto;transform:none}
+.slide-head{position:relative;z-index:2}.center{text-align:center}.eyebrow{display:flex;align-items:center;gap:.65em;color:var(--deep);font-size:clamp(12px,1.1vw,18px);font-weight:900;letter-spacing:.08em}.eyebrow::before{content:"";width:clamp(28px,4vw,60px);height:4px;border-radius:9px;background:var(--teal);box-shadow:0 0 15px rgba(60,186,149,.42)}h1,h2,h3,p{margin:0}h1{font-size:clamp(40px,6.3vw,94px);line-height:1.04;letter-spacing:-.055em}h2{margin-top:.2em;font-size:clamp(26px,3.45vw,54px);line-height:1.2;letter-spacing:-.04em;text-wrap:balance}.sub{font-size:clamp(17px,2.4vw,37px);line-height:1.45;font-weight:760;color:var(--muted)}.paper{background:var(--paper);border:1px solid rgba(60,186,149,.22);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px)}.dark{color:#f5fffc;background:linear-gradient(145deg,#183b34,#102a25);border:1px solid rgba(60,186,149,.7);border-radius:var(--radius);box-shadow:var(--shadow)}
+.reveal{color:transparent;background:linear-gradient(110deg,rgba(60,186,149,.42),rgba(127,170,161,.34));background-size:220% 100%;border-color:rgba(60,186,149,.34);box-shadow:none;animation:pulse 2.2s ease-in-out infinite;transition:.38s ease}.reveal>*{opacity:0;visibility:hidden}.reveal.visible{color:inherit;background:var(--paper);box-shadow:var(--shadow);animation:none}.reveal.visible>*{opacity:1;visibility:visible}.dark.reveal.visible{color:#f5fffc;background:linear-gradient(145deg,#183b34,#102a25);box-shadow:var(--shadow)}@keyframes pulse{50%{background-position:100% 0;opacity:.72}}
+.click-hint{position:absolute;left:clamp(24px,5vw,82px);bottom:clamp(18px,3vw,42px);display:flex;align-items:center;gap:9px;color:var(--muted);font-size:clamp(11px,.95vw,15px);animation:hint 1.7s ease-in-out infinite}.click-hint::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--teal)}@keyframes hint{50%{opacity:.5}}
+.hero{grid-template-columns:1.08fr .92fr;align-items:center}.hero-copy{position:relative;z-index:2}.hero-copy p{margin-top:clamp(16px,2.2vw,32px);color:#58706a;font-size:clamp(22px,2.4vw,37px);font-weight:780}.hero-art{position:relative;width:min(38vw,520px);aspect-ratio:1;justify-self:end;display:grid;place-items:center;animation:float 4s ease-in-out infinite}.hero-art::before{content:"";position:absolute;inset:1%;border-radius:32% 68% 56% 44%;background:radial-gradient(circle,rgba(60,186,149,.32),rgba(60,186,149,.08) 57%,transparent 73%);filter:blur(8px)}.hero-art img{position:relative;width:92%;height:92%;display:block;object-fit:contain;border-radius:26px;filter:drop-shadow(0 20px 28px rgba(35,72,64,.2))}@keyframes float{50%{transform:translate(-9px,-8px) rotate(-1deg)}}
+.media-box{position:relative;overflow:hidden}.media-box img{display:block;width:100%;height:100%;object-fit:contain}.fallback{display:none;width:100%;height:100%;place-items:center;text-align:center;color:var(--deep);background:linear-gradient(145deg,rgba(60,186,149,.2),rgba(127,170,161,.28));font-weight:900}.media-box.load-failed img{display:none}.media-box.load-failed .fallback{display:grid}
+.goal-stack{width:min(1000px,100%);margin:auto;display:grid;gap:clamp(12px,2vh,22px)}.goal-card{min-height:clamp(130px,22vh,210px);display:grid;place-items:center;padding:clamp(20px,3vw,38px);text-align:center;font-size:clamp(22px,2.7vw,42px);line-height:1.5;font-weight:850}.goal-card a{color:var(--deep);font-weight:950;text-decoration-thickness:3px;text-underline-offset:.14em}
+.video-panel{width:min(900px,100%);min-height:min(45vh,400px);margin:auto;display:grid;place-items:center}.video-button{display:grid;place-items:center;width:min(440px,72vw);min-height:clamp(110px,22vh,190px);border-radius:var(--radius);color:white;background:linear-gradient(145deg,#ff6b6b,#d74848);font-size:clamp(28px,4vw,58px);font-weight:950;text-decoration:none;box-shadow:var(--shadow),inset 0 0 0 1px rgba(255,255,255,.28);transition:.2s}.video-button:hover{transform:translateY(-4px) scale(1.01)}
+.school-zone-stack{width:min(980px,100%);margin:auto;display:grid;gap:clamp(12px,2vh,22px)}.school-answer{min-height:clamp(92px,16vh,145px);display:grid;place-items:center;padding:clamp(18px,2.6vw,34px);text-align:center;font-size:clamp(22px,2.8vw,43px);line-height:1.42;font-weight:900}.school-zone-link{min-height:clamp(190px,36vh,330px);display:flex;align-items:center;justify-content:center;gap:clamp(18px,4vw,54px);padding:clamp(20px,3vw,38px);color:var(--ink);text-decoration:none;pointer-events:none}.school-zone-link.visible{pointer-events:auto}.speed-sign{display:grid;place-items:center;width:clamp(118px,15vw,190px);aspect-ratio:1;border:clamp(10px,1.2vw,16px) solid var(--red);border-radius:50%;background:white;color:#202927;font-size:clamp(52px,7vw,94px);font-weight:950;box-shadow:0 10px 30px rgba(255,107,107,.22)}.school-zone-link span:last-child{font-size:clamp(20px,2.5vw,38px);line-height:1.4;font-weight:900}.school-zone-link:hover{transform:translateY(-4px)}
+.impact-pair{width:min(1080px,100%);margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.7vw,24px)}.impact-pair .media-box{height:min(34vh,310px);padding:10px}.impact-pair img{border-radius:18px}.impact-conclusion{width:min(980px,100%);margin:auto;padding:clamp(18px,2.4vw,30px);text-align:center;font-size:clamp(21px,2.65vw,40px);line-height:1.4;font-weight:900}
+.image-pair,.example-grid{width:min(1060px,100%);margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.6vw,22px)}.image-pair .media-box{height:min(43vh,390px);padding:12px}.image-pair img{border-radius:18px}.example-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.example-button{min-width:0;height:min(42vh,370px);padding:12px;cursor:pointer}.example-button img{border-radius:18px}.example-button:hover{transform:translateY(-4px)}
+.definition{width:min(1040px,100%);margin:auto;padding:clamp(22px,3.4vw,48px);display:grid;place-items:center;text-align:center;font-size:clamp(25px,3.2vw,50px);line-height:1.48;font-weight:900}.inline-answer{display:inline-grid;place-items:center;min-width:7em;min-height:1.5em;padding:.05em .3em;border-radius:.45em;vertical-align:middle}.question-card{width:min(940px,100%);margin:auto;padding:clamp(24px,3.5vw,50px);text-align:center;font-size:clamp(24px,3.1vw,48px);line-height:1.45;font-weight:900}
+.lesson-dialog{width:min(790px,90vw);padding:clamp(24px,4vw,52px);border:1px solid rgba(60,186,149,.58);border-radius:var(--radius);color:var(--ink);background:#f7fffc;box-shadow:var(--shadow);cursor:pointer;text-align:center}.lesson-dialog::backdrop{background:rgba(18,43,39,.58);backdrop-filter:blur(6px)}.lesson-dialog p{font-size:clamp(22px,2.7vw,42px);line-height:1.5;font-weight:900}.lesson-dialog small{display:block;margin-top:1em;color:var(--muted);font-weight:700}.image-dialog{width:min(900px,92vw);padding:clamp(16px,2.5vw,30px)}.image-dialog img{display:block;width:100%;max-height:70vh;object-fit:contain;border-radius:18px;background:rgba(127,170,161,.08)}
+.lab-slide{gap:clamp(7px,1vh,12px)}.lab-slide h2{font-size:clamp(22px,2.7vw,42px)}.lab-slide .sub{font-size:clamp(16px,1.9vw,29px)}.cannon-lab{width:min(1040px,calc(100vw - 210px));height:min(58vh,535px);margin:auto;display:grid;grid-template-rows:minmax(0,1fr) auto;overflow:hidden}.cannon-stage{position:relative;min-height:0;background:linear-gradient(#dff4ef,#f7fbfa 76%,#c5d8d2 76%)}.cannon-stage canvas{display:block;width:100%;height:100%}.cannon-controls{display:flex;justify-content:center;align-items:center;gap:clamp(9px,1.4vw,18px);padding:12px;background:rgba(255,255,255,.92);border-top:1px solid var(--line)}.mass-switch,.speed-switch{display:flex;gap:5px;padding:5px;border-radius:16px;background:rgba(127,170,161,.17)}.mass-switch button,.speed-switch button,.lab-action{border:0;border-radius:12px;padding:10px 15px;cursor:pointer;font-weight:900}.mass-switch button,.speed-switch button{color:var(--ink);background:transparent}.mass-switch button.active,.speed-switch button.active{color:white;background:var(--deep)}.lab-action{color:white;background:var(--deep)}.lab-action.fire{background:var(--red)}
+.stack-three{width:min(1040px,100%);margin:auto;display:grid;gap:clamp(9px,1.3vh,15px)}.fact-card{min-height:clamp(90px,15vh,145px);display:grid;place-items:center;padding:clamp(16px,2.3vw,30px);text-align:center;font-size:clamp(19px,2.25vw,34px);line-height:1.45;font-weight:850}.fact-card a{color:var(--green);font-weight:950}.fact-card a:hover{text-decoration-thickness:3px}
+.compare-grid{width:min(1060px,100%);margin:auto;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(14px,2vw,26px)}.placeholder-image{min-height:min(47vh,430px);display:grid;place-items:center;text-align:center;color:var(--deep);font-size:clamp(20px,2.6vw,38px);font-weight:900;background:linear-gradient(145deg,rgba(60,186,149,.18),rgba(127,170,161,.28))}.data-table{width:100%;height:100%;border-collapse:separate;border-spacing:0;overflow:hidden;font-size:clamp(16px,2vw,29px);font-weight:800}.data-table th,.data-table td{width:50%;height:25%;padding:10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}.data-table th{color:#f6fffc;background:var(--deep)}.data-table tr:last-child td{border-bottom:0}.data-table th:last-child,.data-table td:last-child{border-right:0}
+.relation{width:min(980px,100%);margin:auto;padding:clamp(24px,3.6vw,52px);text-align:center;font-size:clamp(25px,3.4vw,52px);line-height:1.45;font-weight:900}.relation-box{width:min(940px,100%);min-height:clamp(130px,22vh,210px);margin:auto;display:grid;place-items:center;padding:clamp(20px,3vw,40px);text-align:center;font-size:clamp(20px,2.7vw,41px);line-height:1.5;font-weight:850}
+.formula-card{width:min(1040px,100%);min-height:clamp(220px,42vh,390px);margin:auto;display:grid;place-items:center;padding:clamp(24px,4vw,58px);text-align:center;font-size:clamp(36px,5.2vw,78px);line-height:1.35;font-weight:950;letter-spacing:-.045em}.formula-card .fraction{display:inline-grid;grid-template-rows:1fr 1fr;vertical-align:middle;line-height:1;font-size:.82em;margin:0 .08em}.formula-card .fraction span:first-child{border-bottom:.08em solid currentColor;padding:0 .12em .08em}.formula-card .fraction span:last-child{padding-top:.08em}.formula-card sup{font-size:.58em;vertical-align:super}.formula-times{color:var(--teal);padding:0 .08em}
+.speed-square-trigger{border:0;border-radius:.3em;padding:.03em .12em;color:#f5fffc;background:rgba(60,186,149,.35);box-shadow:inset 0 0 0 .05em rgba(149,224,108,.7);font-weight:950;cursor:pointer}.speed-square-trigger:hover{background:rgba(60,186,149,.58)}.formula-note{width:min(870px,100%);min-height:clamp(92px,15vh,140px);margin:auto;display:grid;place-items:center;padding:clamp(15px,2.2vw,28px);border:2px dashed rgba(60,186,149,.48);border-radius:var(--radius);color:transparent;background:linear-gradient(110deg,rgba(60,186,149,.24),rgba(127,170,161,.28));font-size:clamp(19px,2.25vw,34px);line-height:1.45;font-weight:850;text-align:center;transition:.35s ease}.formula-note.visible{color:var(--ink);background:var(--paper);border-style:solid;box-shadow:var(--shadow)}
+.compact-fraction{display:inline-grid;grid-template-rows:1fr 1fr;vertical-align:middle;line-height:1;font-size:.82em;margin:0 .06em}.compact-fraction span:first-child{border-bottom:.08em solid currentColor;padding:0 .1em .06em}.compact-fraction span:last-child{padding-top:.06em}.inline-equation{white-space:nowrap;color:var(--deep);font-weight:950}.inline-equation sup{font-size:.62em}.problem-stack{width:min(1080px,100%);margin:auto;display:grid;gap:clamp(9px,1.3vh,15px)}.problem-card{min-height:clamp(112px,18vh,170px);display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,30%);align-items:stretch;overflow:hidden}.problem-text{display:grid;align-content:center;padding:clamp(15px,2vw,28px);font-size:clamp(17px,1.9vw,29px);line-height:1.45;font-weight:800}.answer-button{border:0;border-left:1px solid rgba(60,186,149,.28);color:transparent;background:linear-gradient(110deg,rgba(60,186,149,.35),rgba(127,170,161,.28));font-size:clamp(19px,2.2vw,33px);font-weight:950;cursor:pointer;transition:.3s ease}.answer-button:hover{filter:brightness(.97)}.answer-button.shown{color:#f5fffc;background:linear-gradient(145deg,#183b34,#102a25)}
+.energy-lab{width:min(1060px,calc(100vw - 210px));height:min(63vh,575px);margin:auto;display:grid;grid-template-rows:minmax(0,1fr) auto;overflow:hidden}.energy-stage{min-height:0;background:linear-gradient(#dff4ef,#f7fbfa)}.energy-stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.energy-stage canvas:active{cursor:grabbing}.energy-controls{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(255,255,255,.94);border-top:1px solid var(--line)}.energy-controls button{border:0;border-radius:12px;padding:11px 18px;color:white;background:var(--deep);font-weight:900;cursor:pointer}.energy-controls button:first-of-type{background:var(--teal)}.energy-controls small{color:var(--muted);font-weight:750}
+.energy-flow-layout{width:min(1120px,100%);margin:auto;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(0,1.22fr);gap:clamp(16px,2.5vw,38px);align-items:center}.energy-chain{width:100%;margin:0;display:grid;gap:clamp(6px,1.1vh,12px);padding:clamp(18px,2.2vw,30px);text-align:center}.chain-root,.chain-step{min-height:clamp(72px,11vh,105px);display:grid;place-items:center;border-radius:20px;font-size:clamp(21px,2.7vw,41px);line-height:1.3;font-weight:950}.chain-root{color:#f5fffc;background:linear-gradient(145deg,#183b34,#102a25)}.chain-step{grid-template-rows:auto 1fr}.chain-step .arrow{color:var(--teal);font-size:.85em;line-height:1}.chain-step.reveal.visible{color:var(--ink);background:rgba(255,255,255,.78)}.energy-flow-image{height:min(62vh,570px);padding:clamp(10px,1.4vw,18px)}.energy-flow-image img{display:block;width:100%;height:100%;object-fit:contain}
+.summary-card{width:min(1120px,100%);margin:auto;display:grid;gap:clamp(8px,1.3vh,14px);padding:clamp(18px,2.5vw,34px);font-size:clamp(16px,1.65vw,26px);line-height:1.5;font-weight:800}.summary-card p{padding-bottom:.35em;border-bottom:1px solid var(--line)}.summary-card p:last-of-type{border-bottom:0}.summary-blank{display:inline-grid;place-items:center;min-width:3.2em;min-height:1.55em;margin:.08em;border:0;border-radius:.45em;padding:.04em .38em;font:inherit;font-weight:950;vertical-align:middle;cursor:pointer}.summary-blank.reveal.visible{color:var(--deep);background:rgba(60,186,149,.13);box-shadow:inset 0 0 0 2px rgba(60,186,149,.35)}.summary-note{justify-self:end;color:var(--muted);font-size:.72em;font-weight:750}.summary-card .compact-fraction{font-size:.78em}
+.worksheet-slide{gap:clamp(8px,1vh,14px)}.worksheet-slide h2{font-size:clamp(22px,2.8vw,43px)}.worksheet-viewer{width:min(1180px,100%);height:min(76vh,720px);margin:auto;display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden}.worksheet-toolbar{display:flex;align-items:center;justify-content:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.94)}.worksheet-toolbar button{min-width:46px;border:0;border-radius:12px;padding:9px 14px;color:white;background:var(--deep);font-weight:950;cursor:pointer}.worksheet-toolbar button:hover{background:var(--teal)}.worksheet-zoom-value{min-width:64px;text-align:center;color:var(--deep);font-weight:950}.worksheet-viewport{position:relative;min-height:0;overflow:hidden;background:#dfe9e6;touch-action:none;cursor:grab}.worksheet-viewport.dragging{cursor:grabbing}.worksheet-viewport img{position:absolute;left:50%;top:50%;display:block;max-width:100%;max-height:100%;object-fit:contain;transform:translate(-50%,-50%) translate(0,0) scale(1);transform-origin:center;user-select:none;-webkit-user-drag:none;will-change:transform}
+.nav{position:fixed;z-index:30;right:clamp(10px,2vw,28px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;padding:11px 9px;border-radius:26px;background:rgba(255,255,255,.56);border:1px solid rgba(255,255,255,.78);box-shadow:0 14px 42px rgba(38,60,55,.17);backdrop-filter:blur(16px)}.nav button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);color:var(--ink);background:rgba(255,255,255,.9);cursor:pointer;font-size:22px;font-weight:900}.nav button:hover{background:var(--teal)}.nav button:disabled{opacity:.3;cursor:not-allowed}.progress{width:6px;height:112px;border-radius:8px;background:rgba(38,60,55,.1);overflow:hidden}.progress i{display:block;width:100%;height:8.3333%;border-radius:8px;background:var(--teal);transition:height .35s ease}.counter{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;font-weight:950;letter-spacing:.14em}.toast{position:fixed;z-index:50;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:11px 18px;border-radius:999px;color:white;background:rgba(18,43,39,.94);font-size:14px;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:900px){.slide{padding:20px 74px 20px 22px}.cannon-lab,.energy-lab{width:100%}.example-button{height:min(36vh,320px)}}
+@media(max-width:680px){.slide{padding:16px 14px 76px;overflow:auto;align-content:start}.slide::before{inset:7px}.hero{grid-template-columns:1fr;align-content:center}.hero-art{position:absolute;right:-5%;bottom:9%;width:58vw;opacity:.28}.image-pair,.impact-pair,.example-grid,.compare-grid,.energy-flow-layout{grid-template-columns:1fr}.image-pair .media-box,.impact-pair .media-box{height:30vh}.energy-flow-image{height:42vh}.school-zone-link{flex-direction:column}.example-button{height:28vh}.cannon-lab,.energy-lab{height:65vh;min-height:490px}.cannon-controls,.energy-controls{flex-wrap:wrap}.problem-card{grid-template-columns:1fr}.answer-button{min-height:74px;border-left:0;border-top:1px solid rgba(60,186,149,.28)}.stack-three{padding-bottom:20px}.nav{left:50%;right:auto;top:auto;bottom:7px;transform:translateX(-50%);flex-direction:row;padding:7px 10px}.progress{width:92px;height:6px}.progress i{height:100%;width:5.2632%}.counter{writing-mode:horizontal-tb;transform:none}.click-hint{display:none}}
+@media(max-height:720px) and (min-width:681px){.slide{padding-top:18px;padding-bottom:18px;gap:8px}.goal-card{min-height:18vh}.example-button{height:32vh}.cannon-lab{height:54vh}.fact-card{min-height:12vh}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ===== 편집 모드 ===== */
+.edit-toolbar{position:fixed;z-index:120;left:16px;top:16px;display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid rgba(44,62,58,.18);border-radius:18px;background:rgba(255,255,255,.94);box-shadow:0 12px 34px rgba(18,43,39,.18);backdrop-filter:blur(14px)}
+.edit-toolbar button{border:0;border-radius:12px;padding:9px 13px;font-weight:900;cursor:pointer;color:var(--ink);background:#e8f3ef}.edit-toolbar button:hover{filter:brightness(.97)}
+.edit-toolbar #editModeBtn[aria-pressed="true"]{color:white;background:var(--deep)}
+.edit-toolbar #saveHtmlBtn{color:white;background:var(--teal)}
+.edit-toolbar .edit-status{min-width:54px;color:var(--muted);font-size:12px;font-weight:900;text-align:center}
+body.edit-mode .nav{opacity:.34;pointer-events:none}
+body.edit-mode .slide.active [data-editor-movable]{cursor:move;outline:1px dashed transparent;outline-offset:4px}
+body.edit-mode .slide.active [data-editor-movable]:hover{outline-color:rgba(19,118,95,.46)}
+body.edit-mode .slide.active [data-editor-movable].editor-selected{outline:3px solid rgba(60,186,149,.75);outline-offset:4px}
+body.edit-mode .slide.active [data-editor-text].editor-text-editing{cursor:text;outline:3px solid rgba(255,107,107,.62);outline-offset:4px;user-select:text;-webkit-user-select:text}
+body.edit-mode .slide.active{user-select:none;-webkit-user-select:none}
+body.edit-mode .slide.active .editor-text-editing,body.edit-mode .slide.active .editor-text-editing *{user-select:text;-webkit-user-select:text}
+body.edit-mode .click-hint{display:none!important}
+@media(max-width:680px){.edit-toolbar{left:8px;top:8px;padding:7px}.edit-toolbar button{padding:8px 10px}.edit-toolbar .edit-status{display:none}}
+
+</style>
+</head>
+<body class="">
+<div id="app">
+<div class="edit-toolbar" id="editToolbar" aria-label="편집 도구">
+  <button type="button" id="editModeBtn" aria-pressed="false">편집 OFF</button>
+  <button type="button" id="saveHtmlBtn" title="현재 수정 내용을 새 HTML 파일로 저장">HTML 저장</button>
+  <span class="edit-status" id="editStatus">보기 모드</span>
+</div>
+
+<main aria-live="polite">
+  <section class="slide hero active" data-title="움직이는 물체의 에너지">
+    <div class="hero-copy" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">3단원</div><h1 data-editor-text="1" class="">운동과 에너지</h1><p data-editor-text="1">(5) 움직이는 물체가 갖는 에너지는 뭘까?</p></div>
+    <div class="hero-art media-box" data-editor-movable="1"><img src="https://cdn.phototourl.com/free/2026-08-19-e6f4b997-5bb5-4ce1-8b31-33e39ef2ac8f.jpg" alt="움직이는 물체의 운동 에너지"><div class="fallback">⚡</div></div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="학습 목표">
+    <header class="slide-head" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">학습 목표</div></header>
+    <div class="goal-stack">
+      <div class="goal-card paper reveal" data-order="1" data-editor-movable="1"><p data-editor-text="1">운동 에너지가 무엇인지 설명할 수 있다.</p></div>
+      <div class="goal-card paper reveal" data-order="2" data-editor-movable="1"><p data-editor-text="1">중력이 한 일과 운동 에너지와의 관계를 설명할 수 있다.</p></div>
+    </div>
+    <div class="click-hint">화면을 클릭해 학습 목표를 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="어린이 보호 구역의 제한 속력">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">생각 열기</div><h2 data-editor-text="1">어린이 보호 구역의 제한 속력은 시속 몇 km일까요?</h2></header>
+    <div class="school-zone-stack">
+      <div class="school-answer dark reveal" data-order="1" data-editor-movable="1"><p data-editor-text="1">시속 30km입니다. 근데 왜 하필 30km/h일까요?</p></div>
+      <a class="school-zone-link paper reveal" data-order="2" href="https://www.youtube.com/watch?v=O0ua7xVQPtQ" target="_blank" rel="noopener" data-image-source="https://namu.wiki/w/%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%B3%B4%ED%98%B8%EA%B5%AC%EC%97%AD" aria-label="어린이 보호 구역 관련 영상 보기" data-editor-movable="1">
+        <span class="speed-sign" aria-hidden="true" data-editor-text="1">30</span><span data-editor-text="1">어린이 보호 구역<br><small>눌러서 영상 보기</small></span>
+      </a>
+    </div>
+    <div class="click-hint">화면을 클릭해 답과 자료를 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="60km/h와 30km/h의 충격 비교">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">비교하기</div><h2 data-editor-text="1">60km/h VS 30km/h</h2><p class="sub" data-editor-text="1">속력은 2배 차이입니다. 근데 충돌했을 때 충격도 2배일까요?</p></header>
+    <div class="impact-pair reveal" data-order="1" data-editor-movable="1">
+      <div class="media-box paper"><img src="https://cdn.phototourl.com/free/2026-09-03-91a67578-c0f5-448a-8fdb-f6e974ba9a0b.png" alt="시속 60km 충돌 모습"><div class="fallback">60km/h 충돌 이미지</div></div>
+      <div class="media-box paper"><img src="https://cdn.phototourl.com/free/2026-09-03-bb5f4604-bb04-4e3e-bc57-3903e9369fb2.png" alt="시속 30km 충돌 모습"><div class="fallback">30km/h 충돌 이미지</div></div>
+    </div>
+    <div class="impact-conclusion dark reveal" data-order="2" data-editor-movable="1"><p data-editor-text="1">충격은 속력에 비례하지는 않는 것 같습니다.</p></div>
+    <div class="click-hint">화면을 클릭해 충돌 모습과 결론을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="움직이는 물체가 하는 일">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">관찰하기</div><h2 data-editor-text="1">물체가 움직일 때, 다른 일을 할 수 있습니다.</h2></header>
+    <div class="image-pair" data-editor-movable="1">
+      <div class="media-box paper reveal" data-order="1"><img src="https://cdn.phototourl.com/free/2026-08-19-dcab019e-92d9-4512-84ce-750f3b63b991.jpg" alt="첫 번째 공의 운동"><div class="fallback">이미지 1</div></div>
+      <div class="media-box paper reveal" data-order="2"><img src="https://cdn.phototourl.com/free/2026-08-19-00ebc8c6-39c5-4931-956a-6d1a593d2f21.jpg" alt="두 번째 공의 운동"><div class="fallback">이미지 2</div></div>
+    </div>
+    <div class="impact-conclusion dark reveal" data-order="3" data-editor-movable="1"><p data-editor-text="1">공이 날아가면 다른 물체를 움직이는 일을 할 수 있습니다.<br>즉 에너지를 갖고 있습니다.</p></div>
+    <div class="click-hint">화면을 클릭해 이미지와 핵심 내용을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide" data-title="충돌과 일">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">충돌과 일</div><h2 data-editor-text="1">물체가 움직여 다른 물체와 닿는다면 일을 할 수 있습니다.</h2></header>
+    <div class="example-grid">
+      <button class="example-button media-box paper" type="button" data-detail="https://cdn.phototourl.com/free/2026-08-23-cf6d0020-e085-4af2-b835-a5815a8590df.png" aria-label="첫 번째 충돌 사례 자세히 보기" data-editor-movable="1"><img src="https://cdn.phototourl.com/free/2026-08-23-1bdb26b4-f282-444a-94f7-f8a2de988cef.png" alt="첫 번째 충돌 사례"><span class="fallback">예시 1</span></button>
+      <button class="example-button media-box paper" type="button" data-detail="https://cdn.phototourl.com/free/2026-08-23-c4ca0cf6-cd12-4d9c-82a7-0230cef545ca.png" aria-label="두 번째 충돌 사례 자세히 보기" data-editor-movable="1"><img src="https://cdn.phototourl.com/free/2026-08-23-4c87557e-5e22-429f-9e66-ba540be0adb2.png" alt="두 번째 충돌 사례"><span class="fallback">예시 2</span></button>
+      <button class="example-button media-box paper" type="button" data-detail="https://cdn.phototourl.com/free/2026-08-23-58270708-8079-4b06-8df6-fafbcdfa8be0.png" aria-label="세 번째 충돌 사례 자세히 보기" data-editor-movable="1"><img src="https://cdn.phototourl.com/free/2026-08-23-8365f6a4-9983-4be7-85aa-6d10b2ce4beb.png" alt="세 번째 충돌 사례"><span class="fallback">예시 3</span></button>
+    </div>
+    <div class="click-hint">이미지를 클릭하면 충돌 뒤 모습을 볼 수 있습니다</div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="운동 에너지의 뜻">
+    <header class="slide-head" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">개념 만들기</div></header>
+    <div class="definition paper" data-editor-movable="1">움직이는 물체가 가진 일을 할 수 있는 능력은 <span class="inline-answer reveal" data-order="1"><strong>(운동 에너지)</strong></span>라고 합니다.</div>
+    <div class="question-card dark" data-editor-movable="1" data-editor-text="1">어떤 물체가 운동 에너지를 더 많이 갖고 있을까요?</div>
+    <div class="click-hint">음영 처리된 핵심어를 클릭하세요</div>
+  </section>
+
+  <section class="slide lab-slide" data-title="질량과 운동 에너지 실험">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">가상 실험</div><h2 data-editor-text="1">교실이 부서질 수도 있으니 이걸로 다시 확인해 봅시다.</h2><p class="sub" data-editor-text="1">어떤 경우에 더 많은 에너지를 갖는 것 같나요?</p></header>
+    <div class="cannon-lab paper" data-editor-movable="1">
+      <div class="cannon-stage"><canvas id="cannonCanvas" aria-label="공의 질량에 따른 판의 움직임 실험" width="1558" height="684"></canvas></div>
+      <div class="cannon-controls">
+        <strong>공의 질량</strong>
+        <div class="mass-switch" role="group" aria-label="공의 질량 선택">
+          <button type="button" data-mass="0.1" aria-pressed="true" class="active">0.1kg</button>
+          <button type="button" class="" data-mass="1" aria-pressed="false">1kg</button>
+          <button type="button" data-mass="10" aria-pressed="false">10kg</button>
+        </div>
+        <button class="lab-action fire" type="button" id="fireBtn">발사</button>
+        <button class="lab-action" type="button" id="resetCannonBtn">초기화</button>
+      </div>
+    </div>
+    <dialog class="lesson-dialog" id="massIntro"><p data-editor-text="1">어떤 물체가 운동 에너지가 많을지 먼저 선생님과 함께 확인해 봅시다.</p><small>창을 클릭하면 닫힙니다.</small></dialog>
+  </section>
+
+  <section class="slide reveal-slide" data-title="질량이 클수록">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">질량의 영향</div><h2 data-editor-text="1">여러분이 알고 있듯<br>물체의 질량이 클수록 더 큰 일을 할 수 있습니다.</h2></header>
+    <div class="stack-three">
+      <div class="fact-card paper reveal" data-order="1" data-editor-movable="1"><p data-editor-text="1">질량이 클수록 같은 물체를 더 많이 움직일 수 있습니다.</p></div>
+      <div class="fact-card paper reveal" data-order="2" data-editor-movable="1"><p data-editor-text="1">질량이 클수록 더 무거운 물체도 움직일 수 있습니다.</p></div>
+      <div class="fact-card dark reveal" data-order="3" data-editor-movable="1"><p data-editor-text="1">질량과 운동 에너지의 정확한 관계는 무엇일까요? <a href="https://drive.google.com/file/d/1faC0tgxTodPvToo6kgPxuhtSEo9Af__5/view?usp=sharing" target="_blank" rel="noopener">(확인하기)</a></p></div>
+    </div>
+    <div class="click-hint">화면을 클릭해 내용을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide" data-title="질량이 클수록 운동 에너지가 커집니다">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">결과 해석</div><h2 data-editor-text="1">속력이 같았지만, 질량에 따라 밀어낸 거리가 달랐습니다.</h2></header>
+    <div class="relation-box paper" data-editor-movable="1">
+      <p data-editor-text="1"><button class="summary-blank reveal" type="button" aria-expanded="false" onclick="const v=this.classList.toggle('visible');this.setAttribute('aria-expanded',String(v))"><span>(질량)</span></button>이 클수록, 움직이는 물체는 더 많은 일을 할 수 있습니다.<br><br>즉, <button class="summary-blank reveal" type="button" aria-expanded="false" onclick="const v=this.classList.toggle('visible');this.setAttribute('aria-expanded',String(v))"><span>(질량)</span></button>이 클수록 <button class="summary-blank reveal" type="button" aria-expanded="false" onclick="const v=this.classList.toggle('visible');this.setAttribute('aria-expanded',String(v))"><span>(운동 에너지)</span></button>가 커집니다.</p>
+    </div>
+    <div class="click-hint">음영 처리된 괄호 부분을 클릭해 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="운동 에너지는 질량에 비례">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">관계 정리</div><h2 data-editor-text="1">이후 다양한 실험을 통해 밝혀진 사실...</h2></header>
+    <div class="relation dark" data-editor-movable="1" data-editor-text="1">운동 에너지는 질량에 비례합니다.</div>
+    <div class="stack-three">
+      <div class="fact-card paper reveal" data-order="1" data-editor-movable="1"><p data-editor-text="1">질량이 1배, 2배, 3배…가 되면, 물체의 운동 에너지도 1배, 2배, 3배…가 됩니다.</p></div>
+      <div class="fact-card paper reveal" data-order="2" data-editor-movable="1"><p data-editor-text="1">실험 영상에서 상자가 밀려난 거리가 1배, 2배, 3배.. 가 되지 않은 이유는<br>운동 에너지가 상자를 미는 데에만 전부 사용되지 않았기 때문입니다.</p></div>
+    </div>
+    <div class="click-hint">화면을 클릭해 설명을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide lab-slide" data-title="속력과 운동 에너지 실험">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">가상 실험</div><h2 data-editor-text="1">질량 말고 운동 에너지는 무엇에 영향을 받는지 확인해 봅시다.</h2></header>
+    <div class="cannon-lab paper" data-editor-movable="1">
+      <div class="cannon-stage"><canvas id="speedCanvas" aria-label="공의 속력에 따른 나무 도막의 이동 거리 실험" width="1558" height="684"></canvas></div>
+      <div class="cannon-controls">
+        <strong>공의 속력</strong>
+        <div class="speed-switch" role="group" aria-label="공의 속력 선택">
+          <button type="button" class="" data-speed="1" aria-pressed="false">1배</button>
+          <button type="button" data-speed="2" aria-pressed="false" class="">2배</button>
+          <button type="button" data-speed="3" aria-pressed="true" class="active">3배</button>
+        </div>
+        <button class="lab-action fire" type="button" id="speedFireBtn">발사</button>
+        <button class="lab-action" type="button" id="resetSpeedBtn">초기화</button>
+      </div>
+    </div>
+    <dialog class="lesson-dialog" id="speedIntro"><p data-editor-text="1">질량 말고 다른 특성도 운동 에너지에 영향을 줍니다.<br>먼저 선생님과 함께 확인해 봅시다.</p><small>창을 클릭하면 닫힙니다.</small></dialog>
+  </section>
+
+  <section class="slide reveal-slide" data-title="속력과 운동 에너지의 관계">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">확인하기</div><h2 data-editor-text="1">속력과 운동 에너지의 관계를 확인해봅시다.</h2></header>
+    <div class="goal-stack">
+      <div class="goal-card paper reveal" data-order="1" data-editor-movable="1"><p data-editor-text="1">속력에도 영향을 받습니다.</p></div>
+      <div class="goal-card paper reveal" data-order="2" data-editor-movable="1"><p data-editor-text="1">같은 물체라도 더 빠르게 움직이고 있다면, 더 많은 일을 할 수 있습니다.</p></div>
+    </div>
+    <div class="click-hint">화면을 클릭해 내용을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="운동 에너지의 식">
+    <header class="slide-head center" data-editor-movable="1" data-edit-x="0.0" data-edit-y="-37.3" style="translate: 0px -37.3px;"><div class="eyebrow" data-editor-text="1">개념 완성</div><h2 data-editor-text="1">속력과 질량에 영향을 받는 운동 에너지의 수식은?</h2></header>
+    <div class="formula-card dark reveal" data-order="1" aria-label="운동 에너지는 이분의 일 곱하기 질량 곱하기 속력의 제곱" data-editor-movable="1" data-edit-x="2.7" data-edit-y="-34.8" style="translate: 2.7px -34.8px;">
+      <p data-editor-text="1" class="">운동 에너지<span style="background-color: initial; font-size: clamp(36px, 5.2vw, 78px); letter-spacing: -0.045em;">&nbsp;</span></p><div><div>= <span class="fraction"><span>1</span><span>2</span></span><span class="formula-times">×</span>질량<span class="formula-times">×</span><button class="speed-square-trigger" id="speedSquareTrigger" type="button" aria-expanded="false" aria-controls="formulaNote">(속력)<sup>2</sup></button></div><div>= <span class="fraction"><span>1</span><span>2</span></span>mv<sup>2</sup></div></div><p data-editor-text="1"></p>
+    </div>
+    <div class="formula-note" id="formulaNote" aria-hidden="true" data-editor-movable="1" data-edit-x="14.0" data-edit-y="-41.3" style="translate: 14px -41.3px;">속력이 1배, 2배, 3배…가 되면<br>운동 에너지는 1배, 4배, 9배…가 됩니다.</div>
+    <div class="click-hint">식을 확인한 뒤 강조된 ‘(속력)²’을 클릭하세요</div>
+  </section>
+
+  <section class="slide" data-title="운동 에너지 문제 해결">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">적용하기</div><h2 data-editor-text="1"><span class="inline-equation">운동 에너지 = <span class="compact-fraction"><span>1</span><span>2</span></span> × 질량 × (속력)<sup>2</sup> = <span class="compact-fraction"><span>1</span><span>2</span></span>mv<sup>2</sup></span>을<br>이용해서 문제를 해결해봅시다.</h2></header>
+    <div class="problem-stack">
+      <article class="problem-card paper" data-editor-movable="1"><div class="problem-text" data-editor-text="1">질량이 1kg인 물체가 속력이 5m/s으로 움직이고 있을 때<br>물체가 가진 운동 에너지는?</div><button class="answer-button" type="button" aria-label="첫 번째 문제 정답 보기" aria-expanded="false"><span aria-hidden="true">12.5J</span></button></article>
+      <article class="problem-card paper" data-editor-movable="1"><div class="problem-text" data-editor-text="1">어떤 물체가 속력이 4배로 늘어났다.<br>물체가 가진 운동 에너지는 몇 배가 될까?</div><button class="answer-button" type="button" aria-label="두 번째 문제 정답 보기" aria-expanded="false"><span aria-hidden="true">16배</span></button></article>
+      <article class="problem-card paper" data-editor-movable="1"><div class="problem-text" data-editor-text="1">5kg짜리 볼링공이 2m/s로 움직이고 있고,<br>1kg짜리 축구공이 5m/s로 움직이고 있다.<br>둘 중 어느 공이 운동 에너지가 더 큰가?</div><button class="answer-button" type="button" aria-label="세 번째 문제 정답 보기" aria-expanded="false"><span aria-hidden="true">축구공(12.5J) &gt; 볼링공(10J)</span></button></article>
+    </div>
+    <div class="click-hint">오른쪽의 음영 처리된 답을 클릭하세요</div>
+  </section>
+
+  <section class="slide lab-slide" data-title="위치 에너지와 운동 에너지">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">가상 실험</div><h2 data-editor-text="1">위치 에너지와 운동 에너지의 관계는??</h2></header>
+    <div class="energy-lab paper" data-editor-movable="1">
+      <div class="energy-stage"><canvas id="energyCanvas" aria-label="추의 높이와 낙하 속도에 따른 위치 에너지와 운동 에너지 변화 실험" width="1588" height="756"></canvas></div>
+      <div class="energy-controls">
+        <strong>추의 높이 조절</strong>
+        <button type="button" id="raiseWeightBtn">▲ 위로</button>
+        <button type="button" id="lowerWeightBtn">▼ 아래로</button>
+        <button type="button" id="resetEnergyBtn">초기화</button>
+        <small>추를 직접 끌어도 됩니다. 버튼이나 추에서 손을 떼면 낙하합니다.</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide reveal-slide" data-title="에너지의 전환">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">흐름 정리</div></header>
+    <div class="energy-chain paper" data-editor-movable="1" style="width:min(760px,100%);margin:auto;">
+      <div class="chain-root" data-editor-text="1">중력에 대해 한 일</div>
+      <div class="chain-step reveal" data-order="1"><span class="arrow">↓</span><span data-editor-text="1">위치 에너지</span></div>
+      <div class="chain-step reveal" data-order="2"><span class="arrow">↓</span><span data-editor-text="1">중력이 한 일</span></div>
+      <div class="chain-step reveal" data-order="3"><span class="arrow">↓</span><span data-editor-text="1">운동 에너지</span></div>
+      <div class="chain-step reveal" data-order="4"><span class="arrow">↓</span><span data-editor-text="1">또 다른 일...</span></div>
+    </div>
+    <div class="click-hint">화면을 클릭해 에너지의 흐름을 차례대로 확인하세요</div>
+  </section>
+
+  <section class="slide" data-title="오늘 배운 개념 정리">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">개념 정리</div><h2 data-editor-text="1">오늘 배운 개념들을 정리해 봅시다.</h2></header>
+    <div class="summary-card paper" data-editor-movable="1">
+      <p data-editor-text="1">(1) 움직이는 물체가 갖는 에너지를 <button class="summary-blank reveal" type="button" aria-label="첫 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 운동 에너지 )</span></button> 라고 합니다.</p>
+      <p data-editor-text="1">(2) 물체의 <button class="summary-blank reveal" type="button" aria-label="두 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 운동 에너지 )</span></button>는 물체가 멈추면 <button class="summary-blank reveal" type="button" aria-label="세 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 0 )</span></button>이 됩니다.</p>
+      <p data-editor-text="1">(3) <button class="summary-blank reveal" type="button" aria-label="네 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 운동 에너지 )</span></button>는 <button class="summary-blank reveal" type="button" aria-label="다섯 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 질량 )</span></button>과 <button class="summary-blank reveal" type="button" aria-label="여섯 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 속력<sup>2</sup> )</span></button>에 비례하고,<br>수식으로는 운동 에너지 = <button class="summary-blank reveal" type="button" aria-label="일곱 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( <span class="compact-fraction"><span>1</span><span>2</span></span>mv<sup>2</sup> )</span></button>이다.</p>
+      <p data-editor-text="1" class="">(4) 높은 위치에 있던 물체가 갖고 있던 <button class="summary-blank reveal" type="button" aria-label="여덟 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 중력에 의한 위치 에너지 )</span></button>는 떨어질 때&nbsp;<div>중력이 한 일로 전환되고, 물체 위치가 점점 낮아지며&nbsp;</div><div>중력이 한 일은 <button class="summary-blank reveal" type="button" aria-label="아홉 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 운동 에너지 )</span></button>로 전환된다.</div></p>
+      <p data-editor-text="1" class="">(5) 높은 위치의 물체가 갖고 있던 중력에 의한 위치 에너지&nbsp;<div>= 떨어져 멈추기 직전의 물체의 <button class="summary-blank reveal" type="button" aria-label="열 번째 빈칸 정답 보기" aria-expanded="false" onclick="this.classList.add('visible');this.setAttribute('aria-expanded','true')"><span>( 운동 에너지 )</span></button></div></p>
+      <small class="summary-note" data-editor-text="1">단, 공기 저항과 마찰이 없을 때</small>
+    </div>
+    <div class="click-hint">음영 처리된 빈칸을 클릭해 정답을 확인하세요</div>
+  </section>
+
+  <section class="slide worksheet-slide" data-title="운동 에너지 학습지">
+    <header class="slide-head center" data-editor-movable="1"><div class="eyebrow" data-editor-text="1">학습지 확인</div><h2 data-editor-text="1">학습지 내용을 함께 확인해 봅시다.</h2></header>
+    <div class="worksheet-viewer paper" data-editor-movable="1">
+      <div class="worksheet-toolbar" aria-label="학습지 확대 및 축소">
+        <button type="button" id="worksheetZoomOut" aria-label="학습지 축소">−</button>
+        <span class="worksheet-zoom-value" id="worksheetZoomValue" aria-live="polite">100%</span>
+        <button type="button" id="worksheetZoomIn" aria-label="학습지 확대">＋</button>
+        <button type="button" id="worksheetZoomReset">전체 보기</button>
+      </div>
+      <div class="worksheet-viewport media-box" id="worksheetViewport">
+        <img id="worksheetImage" src="(3-2)3단원-6 학습지(운동6_운동에너지) - 복사본001.png" alt="3단원 운동 에너지 학습지" draggable="false">
+        <span class="fallback">학습지 이미지를 불러오지 못했습니다.</span>
+      </div>
+    </div>
+    <div class="click-hint">버튼으로 확대·축소하고, 이미지를 드래그해 이동하세요</div>
+  </section>
+
+  <dialog class="lesson-dialog image-dialog" id="imageDialog"><img id="detailImage" alt="세 번째 충돌 사례 상세 이미지" src="https://cdn.phototourl.com/free/2026-08-23-58270708-8079-4b06-8df6-fafbcdfa8be0.png"><small>창을 클릭하면 닫힙니다.</small></dialog>
+</main>
+
+<nav class="nav" aria-label="슬라이드 탐색">
+  <button type="button" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+  <div class="progress" aria-hidden="true"><i id="progressFill" style="height: 5.2632%; width: 100%;"></i></div>
+  <div class="counter" id="counter">01 / 19</div>
+  <button type="button" id="nextBtn" aria-label="다음 슬라이드">›</button>
+  <button type="button" id="fullscreenBtn" aria-label="전체 화면">⛶</button>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite">마지막 슬라이드입니다.</div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+const $=selector=>document.querySelector(selector),$$=selector=>[...document.querySelectorAll(selector)];
+const slides=$$(".slide"),counter=$("#counter"),progress=$("#progressFill"),prev=$("#prevBtn"),next=$("#nextBtn"),toast=$("#toast");
+const massIntro=$("#massIntro"),speedIntro=$("#speedIntro"),imageDialog=$("#imageDialog"),detailImage=$("#detailImage");
+let index=0,toastTimer=0;
+const say=message=>{toast.textContent=message;toast.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove("show"),1500)};
+function revealNext(slide){const item=$$(".reveal").filter(element=>element.closest(".slide")===slide).sort((a,b)=>(+a.dataset.order||0)-(+b.dataset.order||0)).find(element=>!element.classList.contains("visible"));if(!item)return false;item.classList.add("visible");return true}
+function closeDialogs(){$$('dialog[open]').forEach(dialog=>dialog.close())}
+function update(){slides.forEach((slide,i)=>slide.classList.toggle("active",i===index));counter.textContent=`${String(index+1).padStart(2,"0")} / ${String(slides.length).padStart(2,"0")}`;const percent=(index+1)/slides.length*100;if(innerWidth<=680){progress.style.width=percent+"%";progress.style.height="100%"}else{progress.style.height=percent+"%";progress.style.width="100%"}prev.disabled=index===0;next.disabled=index===slides.length-1;closeDialogs();if(index!==cannonIndex)stopCannon();if(index!==speedIndex)stopSpeedLab();if(index!==energyIndex)stopEnergyLab();requestAnimationFrame(()=>{if(index===cannonIndex){setupCannon();if(!massIntro.open)massIntro.showModal()}if(index===speedIndex){setupSpeedLab();if(!speedIntro.open)speedIntro.showModal()}if(index===energyIndex)setupEnergyLab()})}
+function go(target){if(target<0||target>=slides.length){say(target<0?"첫 슬라이드입니다.":"마지막 슬라이드입니다.");return}index=target;update()}
+prev.onclick=()=>go(index-1);next.onclick=()=>go(index+1);$("#fullscreenBtn").onclick=async()=>{try{document.fullscreenElement?await document.exitFullscreen():await document.documentElement.requestFullscreen()}catch{say("전체 화면을 사용할 수 없습니다.")}};
+addEventListener("keydown",event=>{if(document.body.classList.contains("edit-mode"))return;if(event.key==="ArrowLeft"||event.key==="PageUp"){event.preventDefault();go(index-1)}if(event.key==="ArrowRight"||event.key==="PageDown"){event.preventDefault();go(index+1)}if(event.key===" "){event.preventDefault();if(!revealNext(slides[index]))go(index+1)}if(event.key==="Home")go(0);if(event.key==="End")go(slides.length-1)});
+slides.forEach(slide=>slide.addEventListener("click",event=>{if(document.body.classList.contains("edit-mode"))return;if(!event.target.closest("button,a,input,label,dialog")&&slide.classList.contains("reveal-slide"))revealNext(slide)}));
+[massIntro,speedIntro,imageDialog].forEach(dialog=>dialog.onclick=()=>dialog.close());
+$$('[data-detail]').forEach(button=>button.onclick=()=>{detailImage.src=button.dataset.detail;detailImage.alt=button.querySelector("img").alt+" 상세 이미지";imageDialog.showModal()});
+$$('.media-box img').forEach(image=>{const fail=()=>image.parentElement.classList.add("load-failed");image.addEventListener("error",fail);if(image.complete&&!image.naturalWidth)fail()});
+$("#speedSquareTrigger").onclick=event=>{event.stopPropagation();const note=$("#formulaNote"),visible=note.classList.toggle("visible");note.setAttribute("aria-hidden",String(!visible));event.currentTarget.setAttribute("aria-expanded",String(visible))};
+$$('.answer-button').forEach(button=>button.onclick=()=>{const shown=button.classList.toggle("shown");button.setAttribute("aria-expanded",String(shown));button.querySelector("span").setAttribute("aria-hidden",String(!shown))});
+
+const worksheetViewport=$("#worksheetViewport"),worksheetImage=$("#worksheetImage"),worksheetZoomValue=$("#worksheetZoomValue");
+let worksheetScale=1,worksheetX=0,worksheetY=0,worksheetDrag=null;
+function renderWorksheet(){worksheetImage.style.transform=`translate(-50%,-50%) translate(${worksheetX}px,${worksheetY}px) scale(${worksheetScale})`;worksheetZoomValue.textContent=`${Math.round(worksheetScale*100)}%`}
+const clampWorksheetScale=value=>Math.max(.5,Math.min(3,value));console.assert(clampWorksheetScale(.25)===.5&&clampWorksheetScale(4)===3,"학습지 확대 범위 확인 실패");
+function zoomWorksheet(change){worksheetScale=clampWorksheetScale(worksheetScale+change);if(worksheetScale===1)worksheetX=worksheetY=0;renderWorksheet()}
+function resetWorksheet(){worksheetScale=1;worksheetX=worksheetY=0;renderWorksheet()}
+$("#worksheetZoomOut").onclick=()=>zoomWorksheet(-.25);$("#worksheetZoomIn").onclick=()=>zoomWorksheet(.25);$("#worksheetZoomReset").onclick=resetWorksheet;
+worksheetViewport.addEventListener("pointerdown",event=>{if(document.body.classList.contains("edit-mode")||event.button!==0)return;event.preventDefault();worksheetDrag={id:event.pointerId,x:event.clientX,y:event.clientY,startX:worksheetX,startY:worksheetY};worksheetViewport.setPointerCapture(event.pointerId);worksheetViewport.classList.add("dragging")});
+worksheetViewport.addEventListener("pointermove",event=>{if(!worksheetDrag||event.pointerId!==worksheetDrag.id)return;worksheetX=worksheetDrag.startX+event.clientX-worksheetDrag.x;worksheetY=worksheetDrag.startY+event.clientY-worksheetDrag.y;renderWorksheet()});
+function finishWorksheetDrag(event){if(!worksheetDrag||event.pointerId!==worksheetDrag.id)return;if(worksheetViewport.hasPointerCapture(event.pointerId))worksheetViewport.releasePointerCapture(event.pointerId);worksheetDrag=null;worksheetViewport.classList.remove("dragging")}
+worksheetViewport.addEventListener("pointerup",finishWorksheetDrag);worksheetViewport.addEventListener("pointercancel",finishWorksheetDrag);
+
+const canvas=$("#cannonCanvas"),ctx=canvas.getContext("2d"),fireBtn=$("#fireBtn"),cannonIndex=slides.indexOf(canvas.closest(".slide"));
+let W=0,H=0,dpr=1,mass=1,animation=0,lastTime=0,ball={},board={};
+function setupCannon(){const rect=canvas.getBoundingClientRect();W=rect.width;H=rect.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(W*dpr));canvas.height=Math.max(1,Math.round(H*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);resetCannon()}
+function resetCannon(){stopCannon();ball={x:W*.14,y:H*.76-20,r:22,vx:0,active:false};board={x:W*.82,y:H*.76,w:20,h:100,angle:0,vx:0,omega:0,hit:false,hitAt:0};drawCannon()}
+function stopCannon(){if(animation){cancelAnimationFrame(animation);animation=0}fireBtn.disabled=false}
+function drawCannon(){ctx.clearRect(0,0,W,H);const floor=H*.76;ctx.fillStyle="#c5d8d2";ctx.fillRect(0,floor,W,H-floor);ctx.fillStyle="#6f9188";ctx.fillRect(0,floor-4,W,4);ctx.save();ctx.translate(W*.10,floor-25);ctx.fillStyle="#365e55";ctx.fillRect(-24,-20,72,36);ctx.beginPath();ctx.arc(-8,20,18,0,Math.PI*2);ctx.arc(34,20,18,0,Math.PI*2);ctx.fillStyle="#183b34";ctx.fill();ctx.rotate(-.08);ctx.fillStyle="#244b43";ctx.fillRect(10,-42,92,31);ctx.restore();ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fillStyle=mass===10?"#ff6b6b":mass===1?"#3cba95":"#95e06c";ctx.fill();ctx.lineWidth=3;ctx.strokeStyle="#183b34";ctx.stroke();ctx.fillStyle="#183b34";ctx.font="900 13px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(mass+"kg",ball.x,ball.y);ctx.save();ctx.translate(board.x,board.y);ctx.rotate(board.angle);ctx.fillStyle="#e9d8b4";ctx.strokeStyle="#7d6549";ctx.lineWidth=3;ctx.fillRect(-board.w/2,-board.h,board.w,board.h);ctx.strokeRect(-board.w/2,-board.h,board.w,board.h);ctx.restore();ctx.textBaseline="alphabetic"}
+function impact(now){ball.active=false;board.hit=true;board.hitAt=now;if(mass===0.1){board.omega=0}else if(mass===1){board.omega=1.7}else{board.omega=3.8;board.vx=W*.085}}
+function cannonFrame(now){if(index!==cannonIndex){stopCannon();return}const dt=Math.min(.033,(now-lastTime)/1000||0);lastTime=now;if(ball.active){ball.x+=ball.vx*dt;if(ball.x+ball.r>=board.x-board.w/2)impact(now)}if(board.hit){if(mass===0.1){const elapsed=now-board.hitAt;if(elapsed<700)board.angle=Math.sin(elapsed/28)*.045*(1-elapsed/700);else{board.angle=0;board.hit=false}}else if(board.angle<Math.PI/2){board.omega+=Math.sin(Math.max(board.angle,.06))*3.1*dt;board.angle=Math.min(Math.PI/2,board.angle+board.omega*dt);board.x+=board.vx*dt;board.vx*=.985}else{board.angle=Math.PI/2;board.hit=false}}drawCannon();if(ball.active||board.hit)animation=requestAnimationFrame(cannonFrame);else{animation=0;fireBtn.disabled=false}}
+function fire(){resetCannon();ball.active=true;ball.vx=W*.78;fireBtn.disabled=true;lastTime=performance.now();animation=requestAnimationFrame(cannonFrame)}
+$$('[data-mass]').forEach(button=>button.onclick=()=>{mass=+button.dataset.mass;$$('[data-mass]').forEach(item=>{const active=item===button;item.classList.toggle("active",active);item.setAttribute("aria-pressed",active)});resetCannon()});
+fireBtn.onclick=fire;$("#resetCannonBtn").onclick=resetCannon;addEventListener("resize",()=>{if(index===cannonIndex)setupCannon()});
+
+const speedCanvas=$("#speedCanvas"),speedCtx=speedCanvas.getContext("2d"),speedFireBtn=$("#speedFireBtn"),speedIndex=slides.indexOf(speedCanvas.closest(".slide"));
+let speedW=0,speedH=0,speedDpr=1,speedLevel=1,speedAnimation=0,speedLastTime=0,speedBall={},woodBlock={},ruler={};
+function setupSpeedLab(){const rect=speedCanvas.getBoundingClientRect();speedW=rect.width;speedH=rect.height;speedDpr=Math.min(devicePixelRatio||1,2);speedCanvas.width=Math.max(1,Math.round(speedW*speedDpr));speedCanvas.height=Math.max(1,Math.round(speedH*speedDpr));speedCtx.setTransform(speedDpr,0,0,speedDpr,0,0);resetSpeedLab()}
+function resetSpeedLab(){stopSpeedLab();const floor=speedH*.72,blockSize=Math.max(48,Math.min(66,speedH*.2)),rulerRight=speedW*.94-blockSize;woodBlock={x:speedW*.48,y:floor-blockSize,size:blockSize,vx:0,moving:false,distance:0,target:0};ruler={start:woodBlock.x,right:rulerRight,y:floor+24,tick:(rulerRight-woodBlock.x)/9};speedBall={x:speedW*.14,y:floor-blockSize*.45,r:Math.max(14,Math.min(21,speedH*.06)),vx:0,active:false};drawSpeedLab()}
+function stopSpeedLab(){if(speedAnimation){cancelAnimationFrame(speedAnimation);speedAnimation=0}speedFireBtn.disabled=false}
+function drawSpeedLab(){speedCtx.clearRect(0,0,speedW,speedH);const floor=speedH*.72;speedCtx.fillStyle="#c5d8d2";speedCtx.fillRect(0,floor,speedW,speedH-floor);speedCtx.fillStyle="#6f9188";speedCtx.fillRect(0,floor-4,speedW,4);
+speedCtx.save();speedCtx.translate(speedW*.09,floor-24);speedCtx.fillStyle="#365e55";speedCtx.fillRect(-22,-19,68,34);speedCtx.beginPath();speedCtx.arc(-7,19,16,0,Math.PI*2);speedCtx.arc(32,19,16,0,Math.PI*2);speedCtx.fillStyle="#183b34";speedCtx.fill();speedCtx.fillStyle="#244b43";speedCtx.fillRect(9,-40,88,29);speedCtx.restore();
+speedCtx.strokeStyle="#355e55";speedCtx.lineWidth=2;speedCtx.beginPath();speedCtx.moveTo(ruler.start,ruler.y);speedCtx.lineTo(ruler.right,ruler.y);for(let i=0;i<=9;i++){const x=ruler.start+ruler.tick*i;speedCtx.moveTo(x,ruler.y-8);speedCtx.lineTo(x,ruler.y+8)}speedCtx.stroke();
+speedCtx.fillStyle="#e6c48c";speedCtx.strokeStyle="#7d6549";speedCtx.lineWidth=3;speedCtx.fillRect(woodBlock.x,woodBlock.y,woodBlock.size,woodBlock.size);speedCtx.strokeRect(woodBlock.x,woodBlock.y,woodBlock.size,woodBlock.size);speedCtx.strokeStyle="rgba(125,101,73,.28)";speedCtx.lineWidth=1.5;for(let y=woodBlock.y+12;y<woodBlock.y+woodBlock.size;y+=13){speedCtx.beginPath();speedCtx.moveTo(woodBlock.x+7,y);speedCtx.bezierCurveTo(woodBlock.x+woodBlock.size*.35,y-5,woodBlock.x+woodBlock.size*.65,y+5,woodBlock.x+woodBlock.size-7,y);speedCtx.stroke()}
+speedCtx.beginPath();speedCtx.arc(speedBall.x,speedBall.y,speedBall.r,0,Math.PI*2);speedCtx.fillStyle="#3cba95";speedCtx.fill();speedCtx.lineWidth=3;speedCtx.strokeStyle="#183b34";speedCtx.stroke()}
+function speedImpact(){speedBall.active=false;speedBall.x=woodBlock.x-speedBall.r;woodBlock.moving=true;woodBlock.target=speedLevel*speedLevel*ruler.tick;const friction=650;woodBlock.vx=Math.sqrt(2*friction*woodBlock.target)}
+function speedFrame(now){if(index!==speedIndex){stopSpeedLab();return}const dt=Math.min(.03,(now-speedLastTime)/1000||0);speedLastTime=now;if(speedBall.active){speedBall.x+=speedBall.vx*dt;if(speedBall.x+speedBall.r>=woodBlock.x)speedImpact()}if(woodBlock.moving){const before=woodBlock.distance;woodBlock.vx=Math.max(0,woodBlock.vx-650*dt);woodBlock.distance=Math.min(woodBlock.target,woodBlock.distance+woodBlock.vx*dt);woodBlock.x+=woodBlock.distance-before;speedBall.x=woodBlock.x-speedBall.r;if(woodBlock.distance>=woodBlock.target-.15||woodBlock.vx===0){woodBlock.x+=woodBlock.target-woodBlock.distance;woodBlock.distance=woodBlock.target;woodBlock.vx=0;woodBlock.moving=false}}drawSpeedLab();if(speedBall.active||woodBlock.moving)speedAnimation=requestAnimationFrame(speedFrame);else{speedAnimation=0;speedFireBtn.disabled=false}}
+function fireSpeedLab(){resetSpeedLab();speedBall.active=true;speedBall.vx=speedW*.48*speedLevel;speedFireBtn.disabled=true;speedLastTime=performance.now();speedAnimation=requestAnimationFrame(speedFrame)}
+$$('[data-speed]').forEach(button=>button.onclick=()=>{speedLevel=+button.dataset.speed;$$('[data-speed]').forEach(item=>{const active=item===button;item.classList.toggle("active",active);item.setAttribute("aria-pressed",active)});resetSpeedLab()});
+speedFireBtn.onclick=fireSpeedLab;$("#resetSpeedBtn").onclick=resetSpeedLab;addEventListener("resize",()=>{if(index===speedIndex)setupSpeedLab()});
+
+const energyCanvas=$("#energyCanvas"),energyCtx=energyCanvas.getContext("2d"),energyIndex=slides.indexOf(energyCanvas.closest(".slide"));
+const gravity=9.8,maxEnergyHeight=10;
+let energyW=0,energyH=0,energyDpr=1,energyHeight=0,energyVelocity=0,energyAnimation=0,energyLastTime=0,energyDropping=false,energyDragging=false,energyHold=0,weightGeometry={};
+const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+function stopEnergyAnimation(){if(energyAnimation){cancelAnimationFrame(energyAnimation);energyAnimation=0}}
+function stopEnergyLab(){stopEnergyAnimation();energyDropping=false;energyDragging=false;energyHold=0;energyVelocity=0}
+function setupEnergyLab(){const rect=energyCanvas.getBoundingClientRect();energyW=rect.width;energyH=rect.height;energyDpr=Math.min(devicePixelRatio||1,2);energyCanvas.width=Math.max(1,Math.round(energyW*energyDpr));energyCanvas.height=Math.max(1,Math.round(energyH*energyDpr));energyCtx.setTransform(energyDpr,0,0,energyDpr,0,0);energyHeight=0;energyVelocity=0;energyDropping=false;energyDragging=false;energyHold=0;stopEnergyAnimation();drawEnergyLab()}
+function energyLayout(){const floor=energyH*.82,r=clamp(energyH*.075,22,34),top=r+energyH*.07,travel=Math.max(1,floor-r-top);return{floor,r,top,travel,x:energyW*.29,gaugeTop:energyH*.17,gaugeHeight:energyH*.52,gaugeWidth:clamp(energyW*.075,42,72),potentialX:energyW*.68,kineticX:energyW*.84}}
+function roundRect(ctx,x,y,w,h,r){const radius=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+radius,y);ctx.arcTo(x+w,y,x+w,y+h,radius);ctx.arcTo(x+w,y+h,x,y+h,radius);ctx.arcTo(x,y+h,x,y,radius);ctx.arcTo(x,y,x+w,y,radius);ctx.closePath()}
+function drawGauge(x,label,percent,color,layout){const {gaugeTop,gaugeHeight,gaugeWidth}=layout;energyCtx.fillStyle="rgba(255,255,255,.72)";energyCtx.strokeStyle="rgba(44,62,58,.2)";energyCtx.lineWidth=2;roundRect(energyCtx,x,gaugeTop,gaugeWidth,gaugeHeight,14);energyCtx.fill();energyCtx.stroke();const fillHeight=gaugeHeight*clamp(percent,0,100)/100;energyCtx.save();roundRect(energyCtx,x+5,gaugeTop+gaugeHeight-fillHeight+5,gaugeWidth-10,Math.max(0,fillHeight-10),9);energyCtx.fillStyle=color;energyCtx.fill();energyCtx.restore();energyCtx.fillStyle="#2c3e3a";energyCtx.font=`900 ${clamp(energyW*.018,13,20)}px sans-serif`;energyCtx.textAlign="center";energyCtx.fillText(label[0],x+gaugeWidth/2,gaugeTop+gaugeHeight+28);energyCtx.fillText(label[1],x+gaugeWidth/2,gaugeTop+gaugeHeight+49);energyCtx.font=`900 ${clamp(energyW*.016,12,18)}px sans-serif`;energyCtx.fillText(`${Math.round(percent)}%`,x+gaugeWidth/2,gaugeTop-12)}
+function drawEnergyLab(){const layout=energyLayout(),y=layout.floor-layout.r-energyHeight/maxEnergyHeight*layout.travel;weightGeometry={x:layout.x,y,r:layout.r,layout};energyCtx.clearRect(0,0,energyW,energyH);const sky=energyCtx.createLinearGradient(0,0,0,layout.floor);sky.addColorStop(0,"#dff4ef");sky.addColorStop(1,"#f7fbfa");energyCtx.fillStyle=sky;energyCtx.fillRect(0,0,energyW,layout.floor);energyCtx.fillStyle="#c5d8d2";energyCtx.fillRect(0,layout.floor,energyW,energyH-layout.floor);energyCtx.fillStyle="#6f9188";energyCtx.fillRect(0,layout.floor-5,energyW,5);energyCtx.setLineDash([7,7]);energyCtx.strokeStyle="rgba(60,186,149,.42)";energyCtx.lineWidth=2;energyCtx.beginPath();energyCtx.moveTo(layout.x,y);energyCtx.lineTo(layout.x,layout.floor);energyCtx.stroke();energyCtx.setLineDash([]);energyCtx.strokeStyle="#365e55";energyCtx.lineWidth=5;energyCtx.beginPath();energyCtx.moveTo(layout.x,y-layout.r-22);energyCtx.lineTo(layout.x,y-layout.r+3);energyCtx.stroke();energyCtx.beginPath();energyCtx.arc(layout.x,y,layout.r,0,Math.PI*2);energyCtx.fillStyle="#3cba95";energyCtx.fill();energyCtx.lineWidth=3;energyCtx.strokeStyle="#183b34";energyCtx.stroke();energyCtx.fillStyle="#183b34";energyCtx.font=`950 ${clamp(layout.r*.55,13,19)}px sans-serif`;energyCtx.textAlign="center";energyCtx.textBaseline="middle";energyCtx.fillText("추",layout.x,y);energyCtx.textBaseline="alphabetic";const potential=energyHeight/maxEnergyHeight*100,kinetic=energyDropping?energyVelocity*energyVelocity/(2*gravity*maxEnergyHeight)*100:0;drawGauge(layout.potentialX,["위치","에너지"],potential,"#7faaa1",layout);drawGauge(layout.kineticX,["운동","에너지"],kinetic,"#ff6b6b",layout);energyCtx.fillStyle="#627973";energyCtx.font=`800 ${clamp(energyW*.014,12,16)}px sans-serif`;energyCtx.textAlign="left";energyCtx.fillText(`높이 ${energyHeight.toFixed(1)} m`,energyW*.08,energyH*.1);energyCtx.fillText(`속력 ${energyVelocity.toFixed(1)} m/s`,energyW*.08,energyH*.15)}
+function startEnergyLoop(){if(!energyAnimation){energyLastTime=performance.now();energyAnimation=requestAnimationFrame(energyFrame)}}
+function startDrop(){energyHold=0;energyDragging=false;if(energyHeight<=0){energyVelocity=0;energyDropping=false;drawEnergyLab();return}energyVelocity=0;energyDropping=true;startEnergyLoop()}
+function energyFrame(now){if(index!==energyIndex){stopEnergyLab();return}const dt=Math.min(.03,(now-energyLastTime)/1000||0);energyLastTime=now;if(energyHold){energyHeight=clamp(energyHeight+energyHold*5*dt,0,maxEnergyHeight);energyVelocity=0;energyDropping=false}else if(energyDropping){energyVelocity+=gravity*dt;energyHeight-=energyVelocity*dt;if(energyHeight<=0){energyHeight=0;energyVelocity=0;energyDropping=false}}drawEnergyLab();if(energyHold||energyDropping)energyAnimation=requestAnimationFrame(energyFrame);else energyAnimation=0}
+function setHeightFromPointer(event){const rect=energyCanvas.getBoundingClientRect(),layout=energyLayout(),pointerY=event.clientY-rect.top;energyHeight=clamp((layout.floor-layout.r-pointerY)/layout.travel*maxEnergyHeight,0,maxEnergyHeight);energyVelocity=0;drawEnergyLab()}
+energyCanvas.addEventListener("pointerdown",event=>{const rect=energyCanvas.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top,{r}=weightGeometry;if(Math.hypot(x-weightGeometry.x,y-weightGeometry.y)>r*1.45)return;event.preventDefault();stopEnergyAnimation();energyDropping=false;energyVelocity=0;energyDragging=true;energyCanvas.setPointerCapture(event.pointerId);setHeightFromPointer(event)});
+energyCanvas.addEventListener("pointermove",event=>{if(!energyDragging)return;event.preventDefault();setHeightFromPointer(event)});
+function releaseWeight(event){if(!energyDragging)return;if(event&&energyCanvas.hasPointerCapture(event.pointerId))energyCanvas.releasePointerCapture(event.pointerId);startDrop()}
+energyCanvas.addEventListener("pointerup",releaseWeight);energyCanvas.addEventListener("pointercancel",releaseWeight);
+function beginHeightControl(direction,event){event.preventDefault();stopEnergyAnimation();energyHeight=clamp(energyHeight+direction*.55,0,maxEnergyHeight);energyVelocity=0;energyDropping=false;energyDragging=true;energyHold=direction;drawEnergyLab();startEnergyLoop()}
+function endHeightControl(){if(!energyHold)return;startDrop()}
+const raiseWeightBtn=$("#raiseWeightBtn"),lowerWeightBtn=$("#lowerWeightBtn");
+raiseWeightBtn.addEventListener("pointerdown",event=>beginHeightControl(1,event));lowerWeightBtn.addEventListener("pointerdown",event=>beginHeightControl(-1,event));addEventListener("pointerup",endHeightControl);addEventListener("pointercancel",endHeightControl);
+[raiseWeightBtn,lowerWeightBtn].forEach((button,i)=>button.addEventListener("click",event=>{if(event.detail!==0)return;energyHeight=clamp(energyHeight+(i===0?1:-1),0,maxEnergyHeight);drawEnergyLab();startDrop()}));
+$("#resetEnergyBtn").onclick=()=>{stopEnergyLab();energyHeight=0;drawEnergyLab()};
+addEventListener("resize",()=>{if(index===energyIndex)setupEnergyLab()});
+addEventListener("resize",update);update();
+})();
+</script>
+
+<script>
+(()=>{let wakeLock=null;async function keepAwake(){if(!("wakeLock" in navigator)||document.visibilityState!=="visible"||wakeLock)return;try{wakeLock=await navigator.wakeLock.request("screen");wakeLock.addEventListener("release",()=>wakeLock=null)}catch{wakeLock=null}}document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")keepAwake()});["pointerdown","keydown","touchstart"].forEach(type=>document.addEventListener(type,keepAwake,{passive:true,once:true}));addEventListener("pageshow",keepAwake);keepAwake()})();
+</script>
+\n<script>
+(()=>{
+"use strict";
+const editBtn=document.getElementById("editModeBtn"),saveBtn=document.getElementById("saveHtmlBtn"),status=document.getElementById("editStatus");
+let editMode=false,drag=null,selected=null,textEditing=null;
+const movableSelector=".slide-head,.hero-copy,.hero-art,.goal-card,.school-answer,.school-zone-link,.impact-pair,.impact-conclusion,.image-pair,.example-button,.definition,.question-card,.cannon-lab,.fact-card,.compare-grid,.relation,.relation-box,.formula-card,.formula-note,.problem-card,.energy-lab,.energy-chain";
+const textSelector="h1,h2,h3,p,td,th,.eyebrow,.sub,.placeholder-image,.problem-text,.relation,.relation-box,.question-card,.chain-root,.chain-step span:last-child,.school-zone-link span:last-child,.speed-sign";
+function register(){
+  document.querySelectorAll(movableSelector).forEach(el=>el.dataset.editorMovable="1");
+  document.querySelectorAll(textSelector).forEach(el=>{if(!el.closest("button")&&!el.matches("button"))el.dataset.editorText="1"});
+}
+function endTextEdit(){if(!textEditing)return;textEditing.removeAttribute("contenteditable");textEditing.classList.remove("editor-text-editing");textEditing=null}
+function select(el){if(selected)selected.classList.remove("editor-selected");selected=el||null;if(selected)selected.classList.add("editor-selected")}
+function setMode(on){
+  editMode=on;document.body.classList.toggle("edit-mode",on);editBtn.setAttribute("aria-pressed",String(on));editBtn.textContent=on?"편집 ON":"편집 OFF";status.textContent=on?"편집 모드":"보기 모드";
+  if(on){document.querySelectorAll("dialog[open]").forEach(d=>d.close())}else{endTextEdit();select(null);drag=null}
+}
+editBtn.addEventListener("click",e=>{e.stopPropagation();setMode(!editMode)});
+document.addEventListener("dblclick",e=>{
+  if(!editMode||!e.ctrlKey)return;
+  const t=e.target.closest("[data-editor-text]");
+  if(!t||!t.closest(".slide.active"))return;
+  e.preventDefault();e.stopPropagation();endTextEdit();select(t.closest("[data-editor-movable]")||null);
+  textEditing=t;t.setAttribute("contenteditable","true");t.classList.add("editor-text-editing");t.focus();
+  const range=document.createRange();range.selectNodeContents(t);range.collapse(false);const sel=getSelection();sel.removeAllRanges();sel.addRange(range);
+},true);
+document.addEventListener("pointerdown",e=>{
+  if(!editMode||e.button!==0)return;if(e.target.closest("#editToolbar")||e.target.closest("dialog"))return;if(e.target.closest(".editor-text-editing"))return;
+  const textTarget=e.target.closest("[data-editor-text]");
+  if(e.ctrlKey&&textTarget&&textTarget.closest(".slide.active")){
+    e.stopPropagation();
+    return;
+  }
+  const el=e.target.closest("[data-editor-movable]");if(!el||!el.closest(".slide.active"))return;e.preventDefault();e.stopPropagation();endTextEdit();select(el);
+  const x=parseFloat(el.dataset.editX||"0"),y=parseFloat(el.dataset.editY||"0");drag={el,id:e.pointerId,startX:e.clientX,startY:e.clientY,x,y};el.setPointerCapture?.(e.pointerId);
+},true);
+document.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;e.preventDefault();const x=drag.x+e.clientX-drag.startX,y=drag.y+e.clientY-drag.startY;drag.el.dataset.editX=x.toFixed(1);drag.el.dataset.editY=y.toFixed(1);drag.el.style.translate=`${x.toFixed(1)}px ${y.toFixed(1)}px`;},true);
+function finishDrag(e){if(!drag||e.pointerId!==drag.id)return;drag.el.releasePointerCapture?.(e.pointerId);drag=null}
+document.addEventListener("pointerup",finishDrag,true);document.addEventListener("pointercancel",finishDrag,true);
+document.addEventListener("click",e=>{if(!editMode)return;if(e.target.closest("#editToolbar")||e.target.closest(".editor-text-editing"))return;endTextEdit()},true);
+document.addEventListener("keydown",e=>{
+  if(!editMode)return;
+  if(textEditing){
+    if(e.key==="Escape"){e.preventDefault();endTextEdit();return;}
+    if(e.key==="Enter"&&e.shiftKey){
+      e.preventDefault();
+      const sel=getSelection();if(!sel||!sel.rangeCount)return;
+      const range=sel.getRangeAt(0);range.deleteContents();
+      const br=document.createElement("br");range.insertNode(br);
+      range.setStartAfter(br);range.collapse(true);sel.removeAllRanges();sel.addRange(range);
+      return;
+    }
+    return;
+  }
+  if((e.key==="Delete"||e.key==="Backspace")&&selected){e.preventDefault();selected.style.display="none";return;}
+  if(selected&&["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)){e.preventDefault();const step=e.shiftKey?10:1;let x=parseFloat(selected.dataset.editX||"0"),y=parseFloat(selected.dataset.editY||"0");if(e.key==="ArrowLeft")x-=step;if(e.key==="ArrowRight")x+=step;if(e.key==="ArrowUp")y-=step;if(e.key==="ArrowDown")y+=step;selected.dataset.editX=x;selected.dataset.editY=y;selected.style.translate=`${x}px ${y}px`;}
+},true);
+function cleanedHtml(){
+  endTextEdit();select(null);const clone=document.documentElement.cloneNode(true);clone.querySelector("body")?.classList.remove("edit-mode");
+  clone.querySelectorAll("[contenteditable]").forEach(el=>el.removeAttribute("contenteditable"));clone.querySelectorAll(".editor-selected,.editor-text-editing").forEach(el=>el.classList.remove("editor-selected","editor-text-editing"));
+  clone.querySelectorAll("dialog[open]").forEach(el=>el.removeAttribute("open"));clone.querySelectorAll(".toast.show").forEach(el=>el.classList.remove("show"));
+  clone.querySelectorAll(".slide").forEach((el,i)=>el.classList.toggle("active",i===0));clone.querySelectorAll(".reveal.visible").forEach(el=>el.classList.remove("visible"));clone.querySelectorAll(".summary-blank").forEach(el=>el.setAttribute("aria-expanded","false"));clone.querySelectorAll(".formula-note.visible").forEach(el=>el.classList.remove("visible"));clone.querySelectorAll(".answer-button.shown").forEach(el=>el.classList.remove("shown"));const wi=clone.querySelector("#worksheetImage"),wv=clone.querySelector("#worksheetZoomValue");if(wi)wi.removeAttribute("style");if(wv)wv.textContent="100%";
+  const eb=clone.querySelector("#editModeBtn"),es=clone.querySelector("#editStatus");if(eb){eb.textContent="편집 OFF";eb.setAttribute("aria-pressed","false")}if(es)es.textContent="보기 모드";
+  return "<!doctype html>\n"+clone.outerHTML.replace(/^<!doctype html>\s*/i,"");
+}
+saveBtn.addEventListener("click",e=>{e.stopPropagation();const blob=new Blob([cleanedHtml()],{type:"text/html;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="운동에너지_수업자료_편집본.html";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);if(typeof say==="function")say("편집한 HTML 파일을 저장했습니다.")});
+register();setMode(false);
+})();
+</script>\n
+
+
+
+</body></html>
